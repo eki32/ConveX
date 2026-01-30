@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs'; // ✅ IMPORTACIÓN CORRECTA
 export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-  private url='http://192.168.1.49:3000'
+  private url='http://convex-production.up.railway.app:3000'
   //private url = 'http://localhost:3000';
 
   // Signal para gestionar el usuario en tiempo real
