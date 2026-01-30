@@ -1,0 +1,59 @@
+<div class="login-screen">
+  <div class="login-card-ultra-wide">
+    
+    <div class="app-title-logo">
+      <span class="app-title-blue">Conve</span><span class="app-title-orange">X</span>
+    </div>
+    
+    <div class="header-text">
+      <h1>Crear Cuenta</h1>
+      <p>Calcula tus atrasos</p>
+    </div>
+    
+   <form (submit)="$event.preventDefault(); enviarRegistro()">
+      <div class="form-container-vertical">
+        
+        <div class="input-container">
+          <label for="nombre">NOMBRE COMPLETO</label>
+          <input type="text" id="nombre" [(ngModel)]="usuario.nombre" name="nombre" placeholder="Tu nombre" required>
+        </div>
+
+        <div class="input-container"> 
+          <label for="apellidos">APELLIDOS</label> 
+          <input type="text" id="apellidos" [(ngModel)]="usuario.apellidos" name="apellidos" placeholder="Tus apellidos" required> 
+        </div>
+
+        <div class="input-container">
+          <label for="email">CORREO ELECTRÓNICO</label>
+          <input type="email" id="email" [(ngModel)]="usuario.email" name="email" placeholder="ejemplo@correo.com" required>
+        </div>
+        
+        <div class="input-container">
+          <label for="password">CONTRASEÑA</label>
+          <input type="password" id="password" [(ngModel)]="usuario.password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <div class="input-container">
+          <label for="fechaAlta">FECHA DE ALTA (CALCULAR ANTIGÜEDAD)</label>
+          <input type="date" id="fechaAlta" [(ngModel)]="usuario.fechaAlta" name="fechaAlta" required>
+        </div>
+
+        <div class="input-container">
+          <label for="categoria">CATEGORÍA PROFESIONAL</label>
+          <select id="categoria" [(ngModel)]="usuario.categoria" name="categoria">
+            <option value="G1">Grupo I</option>
+            <option value="G2">Grupo II</option>
+            <option value="G3">Grupo III</option>
+            <option value="G4">Grupo IV</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-login">Registrate!</button>
+      </div>
+    </form>
+    
+    <div class="login-footer">
+      ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+/* Quitamos márgenes por defecto del navegador */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4; /* Un gris claro de fondo */
+}
+
+/* Contenedor principal que centra el contenido */
+.main-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px); /* Altura total menos el navbar */
+  padding: 20px;
+}

@@ -1,0 +1,53 @@
+const express = require('express');
+const mysql = require('mysql');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const db = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: '', // Pon tu contraseña si tienes
+    database: 'ConveX',
+    port:3307
+});
+
+db.connect(err => {
+    if (err) throw err;
+    console.log('✅ Conectado a MySQL');
+});
+
+app.post('/registro', (req, res) => {
+    const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
+    
+    // Mapeamos fechaAlta (Angular) -> fecha_alta (MySQL)
+    const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
+    
+    db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria], (err, result) => {
+        if (err) {
+            console.error("❌ Error en MySQL:", err.sqlMessage);
+            return res.status(500).json({ error: err.sqlMessage });
+        }
+        res.status(200).json({ message: 'Usuario creado' });
+    });
+});
+
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+
+    db.query(query, [email, password], (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: err });
+        
+        if (result.length > 0) {
+            // Enviamos success: true para que login.ts entre al bloque de navegación
+            res.json({ success: true, user: result[0] });
+        } else {
+            res.json({ success: false, message: 'Usuario no encontrado' });
+        }
+    });
+});
+
+app.listen(3000, () => console.log('🚀 Servidor en puerto 3000'));

@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@google/generative-ai": "^0.24.1",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.16.1",
+    "tesseract.js": "^7.0.0"
+  }
+}

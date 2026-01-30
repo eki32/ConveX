@@ -1,0 +1,54 @@
+/* Estilo de botón resaltado para los años */
+.btn-tabla-naranja {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f37021; /* El naranja de tu marca ConveX */
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(243, 112, 33, 0.2);
+  border: none;
+  text-align: center;
+}
+
+.btn-tabla-naranja:hover {
+  background-color: #d65d1a;
+  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(243, 112, 33, 0.4);
+}
+
+.btn-tabla-naranja i {
+  font-size: 16px;
+  text-align: center;
+}
+
+.btn-tabla-roja {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: crimson; /* El naranja de tu marca ConveX */
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(237, 59, 32, 0.2);
+  border: none;
+}
+
+.btn-tabla-roja:hover {
+  background-color: crimson;
+  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(237, 59, 32, 0.2);
+}
+
+.btn-tabla-roja i {
+  font-size: 16px;
+}

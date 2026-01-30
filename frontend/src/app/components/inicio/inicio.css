@@ -1,0 +1,72 @@
+/* DISEÑO DE LA ZONA DE CARGA */
+.upload-zone {
+  background-color: #fafafa;
+  border: 2px dashed #d1d9e6;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  background-color: #fef4ee;
+  border-color: #f37021; /* Naranja ConveX */
+}
+
+/* AVATAR Y ELEMENTOS VISUALES */
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  background-color: #003366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.border-dashed {
+  border-style: dashed !important;
+}
+
+.text-dark { color: #003366 !important; }
+
+.border-dashed {
+  border: 2px dashed #ced4da !important;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.border-dashed:hover {
+  border-color: #f37021 !important;
+  background-color: #fff8f4;
+}
+
+.upload-zone {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fcfcfc;
+}
+
+.upload-zone:hover {
+  background-color: #f8f9fa;
+  border-color: #f37021 !important;
+  transform: translateY(-2px);
+}
+
+.animate__fadeIn {
+  animation-duration: 0.5s;
+}
+
+.importe-convenio {
+  text-align: right;
+}
+
+.irpf-info {
+  font-size: 0.7rem;
+  color: #777;
+  line-height: 1;
+}
+
+.importe-principal {
+  font-size: 1rem;
+  font-weight: 600;
+}

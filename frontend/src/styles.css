@@ -1,0 +1,21 @@
+/* 1. Evita que el Navbar tape el contenido */
+body {
+  padding-top: 90px !important; 
+  background-color: #f8f9fa; /* Gris muy clarito de fondo */
+}
+
+/* 2. Estilo para la pestaña donde estás parado */
+.nav-link.active {
+  color: #ff6b00 !important;
+  border-bottom: 2px solid #ff6b00;
+}
+
+/* 3. Asegura que el contenedor de Inicio no se pegue a los bordes */
+.container-inicio {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}

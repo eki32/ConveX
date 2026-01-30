@@ -1,0 +1,21 @@
+/* Estilo del Logo: La X en naranja */
+.navbar-brand span {
+  color: #ff6b00; /* Naranja corporativo */
+}
+
+/* Color blanco para el resto del logo por si acaso */
+.navbar-brand {
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+}
+
+/* Estilo para las pestañas de Inicio y Convenios cuando están activas */
+.nav-link.active {
+  color: #ff6b00 !important;
+  border-bottom: 2px solid #ff6b00;
+}
+
+/* Hover suave para los enlaces */
+.nav-link:hover {
+  color: #ff8533 !important;
+}

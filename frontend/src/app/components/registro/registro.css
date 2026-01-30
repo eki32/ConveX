@@ -1,0 +1,121 @@
+.login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8f9fa; /* Color sólido para que destaque la tarjeta */
+  margin: 0;
+  padding: 20px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* TARJETA AJUSTADA AL ALTO DE PANTALLA */
+.login-card-ultra-wide {
+  background: #ffffff;
+  border-radius: 40px; /* Bordes muy redondeados como en tu imagen */
+  padding: 60px 100px;
+  width: 100%;
+  max-width: 1100px;  /* Ancho máximo para que se vea "ultra-wide" */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05); /* Sombra suave idéntica */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* LOGO TEXTO ConveX (Más pequeño para el registro) */
+.app-title-logo {
+  font-size: 60px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.app-title-blue { color: #003366; }
+.app-title-orange { color: #f37021; }
+
+.header-text h1 {
+  color: #003366;
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.header-text p {
+  color: #999;
+  font-size: 14px;
+  margin-bottom: 20px; /* Separación compacta */
+}
+
+/* FORMULARIO VERTICAL COMPACTO */
+.form-container-vertical {
+  width: 100%;
+  max-width: 500px; /* Centramos los inputs para que no se estiren al infinito */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-container {
+  text-align: left;
+}
+
+.input-container label {
+  display: block;
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 4px;
+  font-size: 10px; /* Etiquetas más pequeñas y elegantes */
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* INPUTS Y SELECTS MÁS DELGADOS */
+input, select {
+  width: 100%;
+  padding: 12px 16px; /* Padding vertical reducido */
+  border: 2px solid #f2f2f2;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #f37021;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(243, 112, 33, 0.1);
+}
+
+/* BOTÓN DE REGISTRO */
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  background-color: #f37021;
+  color: #ffffff !important; /* Blanco forzado */
+  border: none;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-login:hover {
+  background-color: #e66010;
+  transform: scale(1.02);
+}
+
+/* FOOTER COMPACTO */
+.login-footer {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #666;
+}
+
+.login-footer a {
+  color: #003366;
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 2px solid #f37021;
+}

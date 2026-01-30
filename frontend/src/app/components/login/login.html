@@ -1,0 +1,33 @@
+<div class="login-screen">
+  <div class="login-card-ultra-wide">
+    
+    <div class="app-title-logo">
+      <span class="app-title-blue">Conve</span><span class="app-title-orange">X</span>
+    </div>
+    
+    <div class="header-text">
+      <h1>Iniciar Sesión</h1>
+      
+    </div>
+    
+    <form (submit)="$event.preventDefault(); onSubmit()">
+      <div class="form-container-vertical">
+        <div class="input-container">
+          <label for="email">CORREO ELECTRÓNICO</label>
+          <input type="email" id="email" [(ngModel)]="credentials.email" name="email" placeholder="ejemplo@correo.com" required>
+        </div>
+        
+        <div class="input-container">
+          <label for="password">CONTRASEÑA</label>
+          <input type="password" id="password" [(ngModel)]="credentials.password" name="password" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn-login"><a routerLink="/inicio"></a>Entrar</button>
+      </div>
+    </form>
+    
+    <div class="login-footer">
+      ¿No tienes cuenta en la plataforma? <a routerLink="/registro">Crea una cuenta aquí</a>
+    </div>
+  </div>
+</div>
