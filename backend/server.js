@@ -1,3 +1,8 @@
+require('dotenv').config(); // <-- Esta línea debe ser la PRIMERA
+const express = require('express');
+const mysql = require('mysql');
+
+
 const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
@@ -7,11 +12,12 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
-    password: '', // Pon tu contraseña si tienes
-    database: 'ConveX',
-    port:3307
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'ConveX',
+    port: process.env.DB_PORT || 3307
+
 });
 
 db.connect(err => {
