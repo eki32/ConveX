@@ -4,15 +4,9 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
+app.use(cors());
 
-app.use(cors({
-  origin: [
-    'https://convex-3vpsfl4iu-ekaitzs-projects-43e98c06.vercel.app', // Tu URL de la imagen
-    'http://localhost:4200' 
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true
-}));
+
 
 app.use(express.json());
 

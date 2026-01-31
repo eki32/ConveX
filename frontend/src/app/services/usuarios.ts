@@ -9,7 +9,7 @@ export class UsuariosService {
   
   private usuarioActual: any = null;
 
-  private apiUrl = 'https://convex-backend-production.up.railway.app'; // Ajusta a tu URL de backend
+  private apiUrl = 'https://convex-production.up.railway.app/login'; // Ajusta a tu URL de backend
 
   constructor(private http: HttpClient) { }
 
