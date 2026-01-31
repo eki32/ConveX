@@ -14,20 +14,39 @@ app.use(cors({
 
 app.use(express.json());
 
-// Ruta de prueba
+// 🔥 IMPORTANTE: Ruta de health check ANTES de MySQL
 app.get('/', (req, res) => {
     res.json({ 
         message: 'API ConveX funcionando correctamente',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        status: 'ok'
     });
 });
 
-const PORT = process.env.PORT || 3000;
+// 🔥 IMPORTANTE: Ruta de prueba de base de datos
+app.get('/health', (req, res) => {
+    db.ping((err) => {
+        if (err) {
+            return res.status(500).json({ 
+                status: 'error', 
+                message: 'Database connection failed',
+                error: err.message 
+            });
+        }
+        res.json({ 
+            status: 'ok', 
+            database: 'connected',
+            timestamp: new Date().toISOString()
+        });
+    });
+});
+
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Servidor en puerto ${PORT}`);
 });
 
-// 🔥 IMPORTANTE: Railway usa estos nombres de variables
+// Conexión a MySQL
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
@@ -39,13 +58,14 @@ const db = mysql.createConnection({
 db.connect(err => {
     if (err) {
         console.error('❌ Error conectando a MySQL:', err.message);
-        console.error('Host:', process.env.MYSQLHOST);
-        console.error('User:', process.env.MYSQLUSER);
-        console.error('Database:', process.env.MYSQLDATABASE);
+        console.error('Host:', process.env.DB_HOST);
+        console.error('User:', process.env.DB_USER);
+        console.error('Database:', process.env.DB_NAME);
+        // No detenemos el servidor si falla MySQL
         return;
     }
     console.log('✅ Conectado a MySQL');
-    console.log('📊 Database:', process.env.MYSQLDATABASE);
+    console.log('📊 Database:', process.env.DB_NAME);
 });
 
 app.post('/registro', (req, res) => {
