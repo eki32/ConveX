@@ -1,18 +1,16 @@
 require('dotenv').config(); // <-- Esta línea debe ser la PRIMERA
 const express = require('express');
 const mysql = require('mysql');
-
-
-const express = require('express');
-const mysql = require('mysql');
 const cors = require('cors');
-
 const app = express();
+
+
 app.use(cors({
   origin: 'https://convex-app-swart.vercel.app', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
