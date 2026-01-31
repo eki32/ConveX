@@ -2,7 +2,12 @@
   "name": "convex-root",
   "version": "1.0.0",
   "scripts": {
-    "start": "node backend/server.js"
+    "start": "node backend/server.js",
+    "ng": "ng",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
