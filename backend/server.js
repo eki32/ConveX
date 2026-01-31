@@ -2,30 +2,44 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
 const app = express();
 
 // Configuración CORS
+/*app.use(cors({
+    origin: ['https://convex-app-kappa.vercel.app', 'http://localhost:4200', 'https://convex-k0hdiejgs-ekaitzs-projects-43e98c06.vercel.app', ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));*/
+
+
 app.use(cors({
     origin: function(origin, callback) {
+        // Permite requests sin origin (como Postman) o desde dominios permitidos
         if (!origin) return callback(null, true);
         
-        const allowedPatterns = [
-            /^https:\/\/.*\.vercel\.app$/,
-            /^http:\/\/localhost(:\d+)?$/
+        const allowedDomains = [
+            /https:\/\/.*\.vercel\.app$/,  // ⭐ Cualquier subdominio .vercel.app
+            /http:\/\/localhost(:\d+)?$/   // localhost con cualquier puerto
         ];
         
-        const isAllowed = allowedPatterns.some(pattern => pattern.test(origin));
-        callback(null, isAllowed);
+        const isAllowed = allowedDomains.some(pattern => pattern.test(origin));
+        
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+
 app.use(express.json());
 
-// Rutas de health check
+// 🔥 IMPORTANTE: Ruta de health check ANTES de MySQL
 app.get('/', (req, res) => {
     res.json({ 
         message: 'API ConveX funcionando correctamente',
@@ -34,6 +48,7 @@ app.get('/', (req, res) => {
     });
 });
 
+// 🔥 IMPORTANTE: Ruta de prueba de base de datos
 app.get('/health', (req, res) => {
     db.ping((err) => {
         if (err) {
@@ -68,35 +83,35 @@ const db = mysql.createConnection({
 db.connect(err => {
     if (err) {
         console.error('❌ Error conectando a MySQL:', err.message);
+        console.error('Host:', process.env.DB_HOST);
+        console.error('User:', process.env.DB_USER);
+        console.error('Database:', process.env.DB_NAME);
+        // No detenemos el servidor si falla MySQL
         return;
     }
     console.log('✅ Conectado a MySQL');
     console.log('📊 Database:', process.env.DB_NAME);
 });
 
-// ========================================
-// 🔐 REGISTRO CON ENCRIPTACIÓN
-// ========================================
+/*app.post('/registro', (req, res) => {
+    const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
+    
+    const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
+    
+    db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria], (err, result) => {
+        if (err) {
+            console.error("❌ Error en MySQL:", err.sqlMessage);
+            return res.status(500).json({ error: err.sqlMessage });
+        }
+        res.status(200).json({ message: 'Usuario creado', id: result.insertId });
+    });
+});*/
 app.post('/registro', async (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
     
-    // Validaciones básicas
-    if (!nombre || !apellidos || !email || !password) {
-        return res.status(400).json({ 
-            error: 'Todos los campos son requeridos' 
-        });
-    }
-
-    if (password.length < 6) {
-        return res.status(400).json({ 
-            error: 'La contraseña debe tener al menos 6 caracteres' 
-        });
-    }
-    
     try {
-        // Verificar si el email ya existe
+        // 1. Verificar si el email ya existe
         const checkQuery = "SELECT email FROM usuarios WHERE email = ?";
-        
         db.query(checkQuery, [email], async (err, results) => {
             if (err) {
                 console.error("❌ Error verificando email:", err);
@@ -104,62 +119,57 @@ app.post('/registro', async (req, res) => {
             }
             
             if (results.length > 0) {
-                return res.status(400).json({ 
-                    error: 'El email ya está registrado' 
-                });
+                return res.status(400).json({ error: 'El email ya está registrado' });
             }
             
-            try {
-                // Encriptar la contraseña
-                console.log(`🔐 Encriptando contraseña para: ${email}`);
-                const hashedPassword = await bcrypt.hash(password, 10);
+            // 2. Encriptar la contraseña
+            const saltRounds = 10; // Nivel de seguridad (10 es el recomendado)
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            
+            // 3. Insertar usuario con contraseña encriptada
+            const insertQuery = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
+            
+            db.query(insertQuery, [nombre, apellidos, email, hashedPassword, fechaAlta, categoria], (err, result) => {
+                if (err) {
+                    console.error("❌ Error en MySQL:", err.sqlMessage);
+                    return res.status(500).json({ error: err.sqlMessage });
+                }
                 
-                // Insertar usuario con contraseña encriptada
-                const insertQuery = `
-                    INSERT INTO usuarios 
-                    (nombre, apellidos, email, password, fecha_alta, categoria) 
-                    VALUES (?, ?, ?, ?, ?, ?)
-                `;
-                
-                db.query(
-                    insertQuery, 
-                    [nombre, apellidos, email, hashedPassword, fechaAlta, categoria], 
-                    (err, result) => {
-                        if (err) {
-                            console.error("❌ Error en MySQL:", err.sqlMessage);
-                            return res.status(500).json({ error: err.sqlMessage });
-                        }
-                        
-                        console.log(`✅ Usuario registrado con éxito: ${email}`);
-                        console.log(`   ID: ${result.insertId}`);
-                        
-                        res.status(200).json({ 
-                            message: 'Usuario creado exitosamente', 
-                            id: result.insertId 
-                        });
-                    }
-                );
-            } catch (bcryptError) {
-                console.error("❌ Error al encriptar contraseña:", bcryptError);
-                return res.status(500).json({ 
-                    error: 'Error al procesar la contraseña' 
+                console.log(`✅ Usuario registrado: ${email}`);
+                res.status(200).json({ 
+                    message: 'Usuario creado exitosamente', 
+                    id: result.insertId 
                 });
-            }
+            });
         });
         
     } catch (error) {
-        console.error("❌ Error general en registro:", error);
+        console.error("❌ Error al procesar registro:", error);
         res.status(500).json({ error: 'Error al procesar el registro' });
     }
 });
 
-// ========================================
-// 🔑 LOGIN CON VERIFICACIÓN SEGURA
-// ========================================
-app.post('/login', (req, res) => {
+
+/*app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+    const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+
+    db.query(query, [email, password], (err, result) => {
+        if (err) {
+            console.error("❌ Error en login:", err);
+            return res.status(500).json({ success: false, message: err.message });
+        }
+        
+        if (result.length > 0) {
+            res.json({ success: true, user: result[0] });
+        } else {
+            res.json({ success: false, message: 'Usuario no encontrado' });
+        }
+    });*/
+    app.post('/login', (req, res) => {
     const { email, password } = req.body;
     
-    // Validaciones básicas
+    // Validar que se envíen email y password
     if (!email || !password) {
         return res.status(400).json({ 
             success: false, 
@@ -180,7 +190,6 @@ app.post('/login', (req, res) => {
         
         // Verificar si el usuario existe
         if (result.length === 0) {
-            console.log(`❌ Intento de login - Usuario no encontrado: ${email}`);
             return res.status(401).json({ 
                 success: false, 
                 message: 'Email o contraseña incorrectos' 
@@ -188,51 +197,31 @@ app.post('/login', (req, res) => {
         }
         
         try {
-            const usuario = result[0];
-            
             // Comparar la contraseña ingresada con el hash almacenado
-            console.log(`🔐 Verificando contraseña para: ${email}`);
-            const match = await bcrypt.compare(password, usuario.password);
+            const match = await bcrypt.compare(password, result[0].password);
             
             if (match) {
                 // ⚠️ IMPORTANTE: NO devolver la contraseña al cliente
-                const { password: _, ...userWithoutPassword } = usuario;
+                const { password: _, ...userWithoutPassword } = result[0];
                 
                 console.log(`✅ Login exitoso: ${email}`);
-                
                 res.json({ 
                     success: true, 
                     user: userWithoutPassword 
                 });
             } else {
-                console.log(`❌ Contraseña incorrecta para: ${email}`);
+                console.log(`❌ Intento de login fallido: ${email}`);
                 res.status(401).json({ 
                     success: false, 
                     message: 'Email o contraseña incorrectos' 
                 });
             }
-        } catch (bcryptError) {
-            console.error("❌ Error al comparar contraseñas:", bcryptError);
+        } catch (error) {
+            console.error("❌ Error al comparar contraseñas:", error);
             res.status(500).json({ 
                 success: false, 
                 message: 'Error al verificar credenciales' 
             });
         }
-    });
-});
-
-// ========================================
-// 📊 OBTENER TODOS LOS USUARIOS (para admin)
-// ========================================
-app.get('/usuarios', (req, res) => {
-    const query = "SELECT id, nombre, apellidos, email, fecha_alta, categoria FROM usuarios";
-    
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error("❌ Error obteniendo usuarios:", err);
-            return res.status(500).json({ error: 'Error al obtener usuarios' });
-        }
-        
-        res.json({ usuarios: results });
     });
 });
