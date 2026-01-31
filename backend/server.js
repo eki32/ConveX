@@ -4,14 +4,20 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-// Configuración CORS
+// ✅ Configuración CORS CORREGIDA
 /*app.use(cors({
-    origin: ['https://convex-app-kappa.vercel.app', 'http://localhost:4200', 'https://convex-k0hdiejgs-ekaitzs-projects-43e98c06.vercel.app', ],
+    origin: [
+        'https://convex-app-kappa.vercel.app',
+        'https://convex-k0hdiejgs-ekaitzs-projects-43e98c06.vercel.app', // ⭐ Añadido
+        'http://localhost:4200',
+        'http://localhost:3000'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));*/
 
+// O MEJOR AÚN: Acepta todos los subdominios de Vercel (más flexible)
 
 app.use(cors({
     origin: function(origin, callback) {
@@ -35,7 +41,6 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 
 app.use(express.json());
 
@@ -93,7 +98,7 @@ db.connect(err => {
     console.log('📊 Database:', process.env.DB_NAME);
 });
 
-/*app.post('/registro', (req, res) => {
+app.post('/registro', (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
     
     const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
@@ -105,52 +110,9 @@ db.connect(err => {
         }
         res.status(200).json({ message: 'Usuario creado', id: result.insertId });
     });
-});*/
-app.post('/registro', async (req, res) => {
-    const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
-    
-    try {
-        // 1. Verificar si el email ya existe
-        const checkQuery = "SELECT email FROM usuarios WHERE email = ?";
-        db.query(checkQuery, [email], async (err, results) => {
-            if (err) {
-                console.error("❌ Error verificando email:", err);
-                return res.status(500).json({ error: 'Error al verificar email' });
-            }
-            
-            if (results.length > 0) {
-                return res.status(400).json({ error: 'El email ya está registrado' });
-            }
-            
-            // 2. Encriptar la contraseña
-            const saltRounds = 10; // Nivel de seguridad (10 es el recomendado)
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-            
-            // 3. Insertar usuario con contraseña encriptada
-            const insertQuery = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
-            
-            db.query(insertQuery, [nombre, apellidos, email, hashedPassword, fechaAlta, categoria], (err, result) => {
-                if (err) {
-                    console.error("❌ Error en MySQL:", err.sqlMessage);
-                    return res.status(500).json({ error: err.sqlMessage });
-                }
-                
-                console.log(`✅ Usuario registrado: ${email}`);
-                res.status(200).json({ 
-                    message: 'Usuario creado exitosamente', 
-                    id: result.insertId 
-                });
-            });
-        });
-        
-    } catch (error) {
-        console.error("❌ Error al procesar registro:", error);
-        res.status(500).json({ error: 'Error al procesar el registro' });
-    }
 });
 
-
-/*app.post('/login', (req, res) => {
+app.post('/login', (req, res) => {
     const { email, password } = req.body;
     const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
@@ -164,64 +126,6 @@ app.post('/registro', async (req, res) => {
             res.json({ success: true, user: result[0] });
         } else {
             res.json({ success: false, message: 'Usuario no encontrado' });
-        }
-    });*/
-    app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    
-    // Validar que se envíen email y password
-    if (!email || !password) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Email y contraseña son requeridos' 
-        });
-    }
-    
-    const query = "SELECT * FROM usuarios WHERE email = ?";
-
-    db.query(query, [email], async (err, result) => {
-        if (err) {
-            console.error("❌ Error en login:", err);
-            return res.status(500).json({ 
-                success: false, 
-                message: 'Error en el servidor' 
-            });
-        }
-        
-        // Verificar si el usuario existe
-        if (result.length === 0) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Email o contraseña incorrectos' 
-            });
-        }
-        
-        try {
-            // Comparar la contraseña ingresada con el hash almacenado
-            const match = await bcrypt.compare(password, result[0].password);
-            
-            if (match) {
-                // ⚠️ IMPORTANTE: NO devolver la contraseña al cliente
-                const { password: _, ...userWithoutPassword } = result[0];
-                
-                console.log(`✅ Login exitoso: ${email}`);
-                res.json({ 
-                    success: true, 
-                    user: userWithoutPassword 
-                });
-            } else {
-                console.log(`❌ Intento de login fallido: ${email}`);
-                res.status(401).json({ 
-                    success: false, 
-                    message: 'Email o contraseña incorrectos' 
-                });
-            }
-        } catch (error) {
-            console.error("❌ Error al comparar contraseñas:", error);
-            res.status(500).json({ 
-                success: false, 
-                message: 'Error al verificar credenciales' 
-            });
         }
     });
 });
