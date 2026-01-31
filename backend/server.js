@@ -9,7 +9,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-  origin: '*', // 👈 Esto permite que cualquier sitio (incluyendo Vercel) se conecte.
+  origin: '*', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -25,7 +25,7 @@ const db = mysql.createConnection({
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'ConveX',
-    port: process.env.DB_PORT || 3307
+    port: process.env.DB_PORT || 3306
 
 });
 
