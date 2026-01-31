@@ -149,7 +149,7 @@ app.post('/login', (req, res) => {
     
     const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
-    db.query(query, [email, password], (err, result) => {
+    db.query(query, [email, password], async (err, result) => {
         if (err) {
             console.error("❌ Error en login:", err);
             return res.status(500).json({ success: false, message: err.message });
