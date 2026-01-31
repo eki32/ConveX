@@ -1,6 +1,6 @@
 require('dotenv').config(); // <-- Esta línea debe ser la PRIMERA
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
