@@ -27,21 +27,25 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Servidor en puerto ${PORT}`);
 });
 
-// Conexión a MySQL usando las variables de Railway
+// 🔥 IMPORTANTE: Railway usa estos nombres de variables
 const db = mysql.createConnection({
-    host: process.env.MYSQL_HOST || process.env.MYSQLHOST || 'localhost',
-    user: process.env.MYSQL_USER || process.env.MYSQLUSER || 'root',
-    password: process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD || '',
-    database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'ConveX',
-    port: process.env.MYSQL_PORT || process.env.MYSQLPORT || 3306
+    host: process.env.MYSQLHOST || 'localhost',
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || '',
+    database: process.env.MYSQLDATABASE || 'ConveX',
+    port: process.env.MYSQLPORT || 3306
 });
 
 db.connect(err => {
     if (err) {
-        console.error('❌ Error conectando a MySQL:', err);
+        console.error('❌ Error conectando a MySQL:', err.message);
+        console.error('Host:', process.env.MYSQLHOST);
+        console.error('User:', process.env.MYSQLUSER);
+        console.error('Database:', process.env.MYSQLDATABASE);
         return;
     }
     console.log('✅ Conectado a MySQL');
+    console.log('📊 Database:', process.env.MYSQLDATABASE);
 });
 
 app.post('/registro', (req, res) => {
