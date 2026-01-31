@@ -19,10 +19,10 @@ app.listen(PORT, '0.0.0.0', () => {
 });
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || 'mysql.railway.internal',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'ConveX',
+    password: process.env.DB_PASSWORD || 'wQsCWchcLubUNItkNCVrLNvzeHunMmYq',
+    database: process.env.DB_NAME || 'railway',
     port: process.env.DB_PORT || 3306
 
 });
