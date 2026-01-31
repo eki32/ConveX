@@ -5,12 +5,37 @@ const cors = require('cors');
 const app = express();
 
 // Configuración CORS
+/*app.use(cors({
+    origin: ['https://convex-app-kappa.vercel.app', 'http://localhost:4200', 'https://convex-k0hdiejgs-ekaitzs-projects-43e98c06.vercel.app', ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));*/
+
+
 app.use(cors({
-    origin: ['https://convex-app-kappa.vercel.app', 'http://localhost:4200'],
+    origin: function(origin, callback) {
+        // Permite requests sin origin (como Postman) o desde dominios permitidos
+        if (!origin) return callback(null, true);
+        
+        const allowedDomains = [
+            /https:\/\/.*\.vercel\.app$/,  // ⭐ Cualquier subdominio .vercel.app
+            /http:\/\/localhost(:\d+)?$/   // localhost con cualquier puerto
+        ];
+        
+        const isAllowed = allowedDomains.some(pattern => pattern.test(origin));
+        
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 app.use(express.json());
 
