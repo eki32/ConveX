@@ -3,9 +3,9 @@
   "version": "1.0.0",
  "scripts": {
   "ng": "ng",
-  "start": "ng serve",
+  "start": "node backend/server.js",
   "build": "ng build",
-  "test": "ng test"
+  "postinstall": "ng build"
 },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
