@@ -52,3 +52,13 @@
 .btn-tabla-roja i {
   font-size: 16px;
 }
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Crea scroll lateral si la tabla es muy grande */
+  -webkit-overflow-scrolling: touch; /* Hace que el scroll sea suave en iPhone */
+}
+
+table {
+  min-width: 600px; /* Obliga a la tabla a mantener un ancho mínimo para que sea legible */
+}

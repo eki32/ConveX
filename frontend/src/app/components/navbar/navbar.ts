@@ -15,7 +15,16 @@ export class NavbarComponent {
   public authService = inject(AuthService);
   private iaService = inject(IaService); // Inyectamos para limpiar el informe
   private router = inject(Router);
+  isMenuOpen = false;
 
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+  this.isMenuOpen = false;
+}
+  
   logout() {
     // 1. Borrar la clave exacta que usaste en el login/inicio
     localStorage.removeItem('usuarioLogueado'); 
@@ -30,4 +39,7 @@ export class NavbarComponent {
     // 4. Redirigir al login
     this.router.navigate(['/login']);
   }
+
+  
 }
+
