@@ -11,7 +11,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private url='https://convex-production.up.railway.app'
-  //private url = 'http://localhost:3000';
+
 
   // Signal para gestionar el usuario en tiempo real
   public currentUser = signal<any>(null);
@@ -47,7 +47,7 @@ export class AuthService {
   // Login: Convertido a Promesa para usar async/await en login.ts
   async login(credentials: any): Promise<any> {
     try {
-        // La URL final debe ser http://localhost:3000/login
+    
         return await firstValueFrom(this.http.post(`${this.url}/login`, credentials));
     } catch (error) {
         console.error('Error en la petición de login:', error);
