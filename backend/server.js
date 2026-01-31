@@ -8,7 +8,11 @@ const mysql = require('mysql');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: '*', // 👈 Esto permite que cualquier sitio (incluyendo Vercel) se conecte.
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
@@ -60,5 +64,3 @@ app.post('/login', (req, res) => {
         }
     });
 });
-
-app.listen(3000, () => console.log('🚀 Servidor en puerto 3000'));

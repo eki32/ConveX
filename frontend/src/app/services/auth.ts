@@ -4,6 +4,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { firstValueFrom } from 'rxjs'; // ✅ IMPORTACIÓN CORRECTA
 
 @Injectable({ providedIn: 'root' })
+
+
+
 export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
