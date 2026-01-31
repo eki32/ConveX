@@ -6,9 +6,12 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'https://convex-app-swart.vercel.app', 
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type']
+  origin: [
+    'https://convex-3vpsfl4iu-ekaitzs-projects-43e98c06.vercel.app', // Tu URL de la imagen
+    'http://localhost:4200' 
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 
 app.use(express.json());
