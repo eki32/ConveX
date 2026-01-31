@@ -147,7 +147,7 @@ app.post('/login', (req, res) => {
         });
     }
     
-    const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+    const query = "SELECT * FROM usuarios WHERE email = ?";
 
     db.query(query, [email, password], async (err, result) => {
         if (err) {
