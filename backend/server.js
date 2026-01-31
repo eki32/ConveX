@@ -1,47 +1,52 @@
-require('dotenv').config(); // <-- Esta línea debe ser la PRIMERA
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-app.use((req, res, next) => {
-    // Permitimos cualquier origen para que Vercel no tenga problemas
-    res.header("Access-Control-Allow-Origin", "*"); 
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    
-    // ESTA ES LA CLAVE: Responder 200 a la petición de prueba (preflight)
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-});
+// Configuración CORS
+app.use(cors({
+    origin: ['https://convex-app-kappa.vercel.app', 'http://localhost:4200'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+// Ruta de prueba
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'API ConveX funcionando correctamente',
+        timestamp: new Date().toISOString()
+    });
 });
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'ConveX',
-    port: process.env.DB_PORT || 3306
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Servidor en puerto ${PORT}`);
+});
 
+// Conexión a MySQL usando las variables de Railway
+const db = mysql.createConnection({
+    host: process.env.MYSQL_HOST || process.env.MYSQLHOST || 'localhost',
+    user: process.env.MYSQL_USER || process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD || '',
+    database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE || 'ConveX',
+    port: process.env.MYSQL_PORT || process.env.MYSQLPORT || 3306
 });
 
 db.connect(err => {
-    if (err) throw err;
+    if (err) {
+        console.error('❌ Error conectando a MySQL:', err);
+        return;
+    }
     console.log('✅ Conectado a MySQL');
 });
 
 app.post('/registro', (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
     
-    // Mapeamos fechaAlta (Angular) -> fecha_alta (MySQL)
     const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
     
     db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria], (err, result) => {
@@ -49,7 +54,7 @@ app.post('/registro', (req, res) => {
             console.error("❌ Error en MySQL:", err.sqlMessage);
             return res.status(500).json({ error: err.sqlMessage });
         }
-        res.status(200).json({ message: 'Usuario creado' });
+        res.status(200).json({ message: 'Usuario creado', id: result.insertId });
     });
 });
 
@@ -58,10 +63,12 @@ app.post('/login', (req, res) => {
     const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
     db.query(query, [email, password], (err, result) => {
-        if (err) return res.status(500).json({ success: false, message: err });
+        if (err) {
+            console.error("❌ Error en login:", err);
+            return res.status(500).json({ success: false, message: err.message });
+        }
         
         if (result.length > 0) {
-            // Enviamos success: true para que login.ts entre al bloque de navegación
             res.json({ success: true, user: result[0] });
         } else {
             res.json({ success: false, message: 'Usuario no encontrado' });
