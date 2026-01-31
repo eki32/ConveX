@@ -10,7 +10,7 @@ import { firstValueFrom } from 'rxjs'; // ✅ IMPORTACIÓN CORRECTA
 export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-  private url='https://convex-production.up.railway.app'
+  private url='https://convex-production.up.railway.app/'
 
 
   // Signal para gestionar el usuario en tiempo real
@@ -48,7 +48,7 @@ export class AuthService {
   async login(credentials: any): Promise<any> {
     try {
     
-        return await firstValueFrom(this.http.post(`${this.url}/login`, credentials));
+        return await firstValueFrom(this.http.post(`${this.url}login`, credentials));
     } catch (error) {
         console.error('Error en la petición de login:', error);
         throw error;

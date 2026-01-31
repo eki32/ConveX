@@ -9,12 +9,12 @@ export class UsuariosService {
   
   private usuarioActual: any = null;
 
-  private apiUrl = 'https://convex-production.up.railway.app/login'; // Ajusta a tu URL de backend
+  private apiUrl = 'https://convex-production.up.railway.app/'; // Ajusta a tu URL de backend
 
   constructor(private http: HttpClient) { }
 
   async login(credentials: any): Promise<any> {
-    const res: any = await firstValueFrom(this.http.post(`${this.apiUrl}/login`, credentials));
+    const res: any = await firstValueFrom(this.http.post(`${this.apiUrl}login`, credentials));
     if (res.success) {
       this.setUsuario(res.user); // Guardamos los datos al loguear
     }

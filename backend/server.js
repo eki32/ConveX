@@ -4,9 +4,11 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-app.use(cors());
-
-
+app.use(cors({
+  origin: '*', // Esto permite que CUALQUIER sitio (incluyendo Vercel) se conecte
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 
