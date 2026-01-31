@@ -100,12 +100,16 @@ db.connect(err => {
 
 app.post('/registro', (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
-   
+    
+    // Limpiamos la fecha para que MySQL no se queje
+    // Esto convierte "2026-01-31T..." en "2026-01-31"
+    const fechaLimpia = fechaAlta ? fechaAlta.split('T')[0] : null;
+
     const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
-    db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria, jornada || 40], (err, result) => {
+    db.query(query, [nombre, apellidos, email, password, fechaLimpia, categoria, jornada || 40], (err, result) => {
         if (err) {
-            console.error("❌ Error en MySQL:", err.sqlMessage);
+            console.error("❌ Error detallado:", err); // Mira esto en los logs de Railway
             return res.status(500).json({ error: err.sqlMessage });
         }
         res.status(200).json({ message: 'Usuario creado', id: result.insertId });
