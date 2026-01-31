@@ -9,7 +9,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors({
-  origin: '*', 
+  origin: 'https://convex-app-swart.vercel.app', 
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
