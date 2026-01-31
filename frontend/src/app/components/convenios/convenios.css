@@ -62,3 +62,39 @@
 table {
   min-width: 600px; /* Obliga a la tabla a mantener un ancho mínimo para que sea legible */
 }
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Scroll suave tipo app nativa */
+  border-radius: 0 0 15px 15px; /* Bordes redondeados abajo para coincidir con la card */
+}
+
+/* Forzamos el ancho mínimo solo en las tablas de datos para que no se amontonen */
+.table-responsive table {
+  min-width: 800px; /* Un poco más de margen para que los nombres de oficio respiren */
+  margin-bottom: 0;
+}
+
+/* Ajuste de los botones PDF en móvil para que no ocupen tanto */
+@media (max-width: 768px) {
+  .btn-tabla-naranja, .btn-tabla-roja {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Reducimos un poco el padding de las celdas en móvil */
+  .table td, .table th {
+    padding: 12px 8px !important;
+  }
+}
+
+/* Estilo visual del scrollbar (opcional, para que se vea más moderno) */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
