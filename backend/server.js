@@ -5,11 +5,12 @@ const cors = require('cors');
 const app = express();
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*"); // Permitir Vercel
+    // Permitimos cualquier origen para que Vercel no tenga problemas
+    res.header("Access-Control-Allow-Origin", "*"); 
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     
-    // Si el navegador pregunta (OPTIONS), respondemos OK de inmediato
+    // ESTA ES LA CLAVE: Responder 200 a la petición de prueba (preflight)
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
