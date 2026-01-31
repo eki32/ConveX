@@ -4,11 +4,17 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 
-app.use(cors({
-  origin: '*', // Esto permite que CUALQUIER sitio (incluyendo Vercel) se conecte
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*"); // Permitir Vercel
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    
+    // Si el navegador pregunta (OPTIONS), respondemos OK de inmediato
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
 
 app.use(express.json());
 
