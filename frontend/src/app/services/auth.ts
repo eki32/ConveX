@@ -41,7 +41,7 @@ export class AuthService {
 
   // Registro: Mantenemos el Observable para que el componente maneje el éxito/error
   registrar(datos: any) {
-    return this.http.post(`${this.url}/registro`, datos);
+    return this.http.post(`${this.url}registro`, datos);
   }
 
   // Login: Convertido a Promesa para usar async/await en login.ts
