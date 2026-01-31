@@ -122,7 +122,7 @@ app.post('/registro', (req, res) => {
             const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             // NOTA: Aquí deberías usar 'hashedPassword' si quieres que se guarde encriptada
-            db.query(query, [nombre, apellidos, email, password, fechaLimpia, categoria, jornada || 40], (err, result) => {
+            db.query(query, [nombre, apellidos, email, hashedPassword, fechaLimpia, categoria, jornada || 40], (err, result) => {
                 if (err) {
                     console.error("❌ Error detallado:", err);
                     return res.status(500).json({ error: err.sqlMessage });
