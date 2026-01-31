@@ -1,10 +1,11 @@
-/* Estilo de botón resaltado para los años */
+/* --- ESTILOS DE BOTONES (ConveX) --- */
+
 .btn-tabla-naranja {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: #f37021; /* El naranja de tu marca ConveX */
+  background-color: #f37021;
   color: white !important;
   border-radius: 12px;
   font-weight: 800;
@@ -18,13 +19,8 @@
 
 .btn-tabla-naranja:hover {
   background-color: #d65d1a;
-  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  transform: translateY(-3px);
   box-shadow: 0 6px 15px rgba(243, 112, 33, 0.4);
-}
-
-.btn-tabla-naranja i {
-  font-size: 16px;
-  text-align: center;
 }
 
 .btn-tabla-roja {
@@ -32,7 +28,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background-color: crimson; /* El naranja de tu marca ConveX */
+  background-color: crimson;
   color: white !important;
   border-radius: 12px;
   font-weight: 800;
@@ -44,70 +40,89 @@
 }
 
 .btn-tabla-roja:hover {
-  background-color: crimson;
-  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  background-color: #a00000;
+  transform: translateY(-3px);
   box-shadow: 0 6px 15px rgba(237, 59, 32, 0.2);
 }
 
-.btn-tabla-roja i {
-  font-size: 16px;
-}
-
-.table-container {
-  width: 100%;
-  overflow-x: auto; /* Crea scroll lateral si la tabla es muy grande */
-  -webkit-overflow-scrolling: touch; /* Hace que el scroll sea suave en iPhone */
-}
-
-table {
-  min-width: 600px; /* Obliga a la tabla a mantener un ancho mínimo para que sea legible */
-}
+/* --- CONTENEDOR RESPONSIVE INTELIGENTE --- */
 
 .table-responsive {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch; /* Scroll suave tipo app nativa */
-  border-radius: 0 0 15px 15px; /* Bordes redondeados abajo para coincidir con la card */
+  -webkit-overflow-scrolling: touch; /* Inercia suave en iPhone */
+  border-radius: 0 0 15px 15px;
+  position: relative;
+  background-color: white;
 }
 
-/* Forzamos el ancho mínimo solo en las tablas de datos para que no se amontonen */
 .table-responsive table {
-  min-width: 800px; /* Un poco más de margen para que los nombres de oficio respiren */
+  min-width: 850px !important; /* Fuerza el ancho para evitar amontonamiento */
+  border-collapse: separate !important; /* Vital para que funcione el sticky */
+  border-spacing: 0;
   margin-bottom: 0;
 }
 
-/* Ajuste de los botones PDF en móvil para que no ocupen tanto */
+/* --- COLUMNA FIJA (OFICIO / CATEGORÍA) --- */
+
+/* Seleccionamos la segunda columna (nth-child(2)) que es el Oficio */
+.table-responsive th:nth-child(2),
+.table-responsive td:nth-child(2) {
+  position: -webkit-sticky;
+  position: sticky;
+  left: 0; /* Se ancla al borde izquierdo al hacer scroll */
+  z-index: 10;
+  background-color: #ffffff !important;
+  border-right: 2px solid #dee2e6; /* Línea divisoria visual */
+}
+
+/* Ajuste de color para cuando la fila es secundaria (header) */
+.table-secondary th:nth-child(2) {
+  background-color: #e9ecef !important; 
+  z-index: 11;
+}
+
+/* Ajuste para filas resaltadas o de peligro (DIA) */
+.table-light td:nth-child(2) {
+  background-color: #f8f9fa !important;
+}
+
+.text-danger td:nth-child(2), 
+tr.table-light td.text-danger:nth-child(2) {
+    background-color: #fff5f5 !important;
+}
+
+/* --- OPTIMIZACIÓN PARA MÓVILES (Breakpoints) --- */
+
 @media (max-width: 768px) {
-  .btn-tabla-naranja, .btn-tabla-roja {
+  .btn-tabla-naranja, 
+  .btn-tabla-roja {
     padding: 4px 10px !important;
     font-size: 0.75rem !important;
     border-radius: 8px !important;
   }
-  
-  /* Reducimos un poco el padding de las celdas en móvil */
-  .table td, .table th {
-    padding: 12px 8px !important;
+
+  .table td, 
+  .table th {
+    padding: 10px 6px !important;
+    font-size: 0.85rem;
+  }
+
+  /* Reducimos el ancho de la primera columna (Grupo) para dar espacio al Oficio */
+  .table-responsive th:nth-child(1),
+  .table-responsive td:nth-child(1) {
+    width: 60px !important;
+    min-width: 60px !important;
   }
 }
 
-/* Estilo visual del scrollbar (opcional, para que se vea más moderno) */
+/* --- ESTILO DEL SCROLLBAR --- */
+
 .table-responsive::-webkit-scrollbar {
   height: 6px;
 }
+
 .table-responsive::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #f37021; /* Naranja ConveX */
   border-radius: 10px;
-}
-
-.table-responsive td:nth-child(2), 
-.table-responsive th:nth-child(2) {
-  position: sticky;
-  left: 0;
-  background-color: white; /* O el color de fondo de tu fila */
-  z-index: 2;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-}
-
-.table-dark th:nth-child(2) {
-  background-color: #212529; /* Color oscuro para el header fijo */
 }
