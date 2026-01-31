@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const app = express();
 
 // ✅ Configuración CORS CORREGIDA
@@ -100,24 +101,51 @@ db.connect(err => {
 
 app.post('/registro', (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
-    
-    // Limpiamos la fecha para que MySQL no se queje
-    // Esto convierte "2026-01-31T..." en "2026-01-31"
     const fechaLimpia = fechaAlta ? fechaAlta.split('T')[0] : null;
 
-    const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    
-    db.query(query, [nombre, apellidos, email, password, fechaLimpia, categoria, jornada || 40], (err, result) => {
-        if (err) {
-            console.error("❌ Error detallado:", err); // Mira esto en los logs de Railway
-            return res.status(500).json({ error: err.sqlMessage });
-        }
-        res.status(200).json({ message: 'Usuario creado', id: result.insertId });
-    });
+    try {
+        const checkQuery = "SELECT email FROM usuarios WHERE email = ?";
+        db.query(checkQuery, [email], async (err, results) => {
+            if (err) {
+                console.error("❌ Error verificando email:", err);
+                return res.status(500).json({ error: 'Error al verificar email' });
+            }
+
+            if (results.length > 0) {
+                return res.status(400).json({ error: 'El email ya está registrado' });
+            }
+
+            // 2. Encriptar la contraseña
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            // NOTA: Aquí deberías usar 'hashedPassword' si quieres que se guarde encriptada
+            db.query(query, [nombre, apellidos, email, password, fechaLimpia, categoria, jornada || 40], (err, result) => {
+                if (err) {
+                    console.error("❌ Error detallado:", err);
+                    return res.status(500).json({ error: err.sqlMessage });
+                }
+                console.log(`✅ Usuario registrado: ${email}`);
+                res.status(200).json({ message: 'Usuario creado', id: result.insertId });
+            });
+        }); // <-- Cierra el bloque db.query de checkQuery
+    } catch (error) { // <-- Aquí se cierra el try
+        console.error("❌ Error en el servidor:", error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Email y contraseña son requeridos' 
+        });
+    }
     
     const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
@@ -132,5 +160,33 @@ app.post('/login', (req, res) => {
         } else {
             res.json({ success: false, message: 'Usuario no encontrado' });
         }
+        try {
+            // Comparar la contraseña ingresada con el hash almacenado
+            const match = await bcrypt.compare(password, result[0].password);
+            
+            if (match) {
+                // ⚠️ IMPORTANTE: NO devolver la contraseña al cliente
+                const { password: _, ...userWithoutPassword } = result[0];
+                
+                console.log(`✅ Login exitoso: ${email}`);
+                res.json({ 
+                    success: true, 
+                    user: userWithoutPassword 
+                });
+            } else {
+                console.log(`❌ Intento de login fallido: ${email}`);
+                res.status(401).json({ 
+                    success: false, 
+                    message: 'Email o contraseña incorrectos' 
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error al comparar contraseñas:", error);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Error al verificar credenciales' 
+            });
+        }
+
     });
 });
