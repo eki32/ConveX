@@ -99,11 +99,11 @@ db.connect(err => {
 });
 
 app.post('/registro', (req, res) => {
-    const { nombre, apellidos, email, password, fechaAlta, categoria } = req.body;
+    const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
+   
+    const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
     
-    const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria) VALUES (?, ?, ?, ?, ?, ?)";
-    
-    db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria], (err, result) => {
+    db.query(query, [nombre, apellidos, email, password, fechaAlta, categoria, jornada || 40], (err, result) => {
         if (err) {
             console.error("❌ Error en MySQL:", err.sqlMessage);
             return res.status(500).json({ error: err.sqlMessage });
@@ -114,6 +114,7 @@ app.post('/registro', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
+    
     const query = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
     db.query(query, [email, password], (err, result) => {
