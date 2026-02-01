@@ -92,7 +92,7 @@ getSalarioDiaAnio(base2022: number, anio: number): number {
   // API Key correcta
   public resultadosGuardados: any[] = [];
   public totales = { bruto: 0, neto: 0 };
-  private backendUrl = 'convex-production.up.railway.app';
+ private backendUrl = 'https://convex-production.up.railway.app/';
 
   // ✅ Modelo que SÍ tienes disponible
  /* private apiUrl =
