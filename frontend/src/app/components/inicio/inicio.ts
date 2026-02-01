@@ -15,9 +15,15 @@ export class InicioComponent implements OnInit {
   private iaService = inject(IaService);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
-datos: any;
+  datos: any;
 
- 
+  // --- SECCIÓN CORREGIDA: Eliminadas variables vacías de excesos ---
+  // Mantenemos solo la referencia a las jornadas anuales por si las necesitas en el dashboard
+  jornadasAnuales: any = {
+    2024: 1714,
+    2025: 1710
+  };
+
   get resultados() { return this.iaService.resultadosGuardados; }
   set resultados(val) { this.iaService.resultadosGuardados = val; }
 
@@ -29,10 +35,9 @@ datos: any;
   indiceAnalizando = 0;
   mostrarResultados = false;
   irpfManual: number = 2; 
-
+  anioActual = new Date().getFullYear();
 
   ngOnInit() {
-
     this.totalAtrasos = this.iaService.totales.bruto;
     this.totalNetoEstimado = this.iaService.totales.neto;
     
@@ -48,45 +53,46 @@ datos: any;
           nombre: d.nombre, 
           grupo: d.categoria || 'G4', 
           fechaAlta: d.fecha_alta,
-          email: d.email 
+          email: d.email,
+          // Añadimos la jornada aquí para que ExcesosComponent la lea correctamente
+          jornadaContrato: d.jornadaContrato || 40 
         };
       }
     }
   }
 
+  // Eliminado calcularExceso() vacío y variables duplicadas (totalExceso, diasLibres, etc.)
+  // ya que ahora viven en ExcesosComponent.
+
   // --- GESTIÓN DE ARCHIVOS ---
   async onFilesSelected(event: any) {
-  const files: FileList = event.target.files;
-  if (!files || files.length === 0) return;
+    const files: FileList = event.target.files;
+    if (!files || files.length === 0) return;
 
-  // Cambiamos el límite de 15 a 4 para proteger la API
-  const seleccionados = Array.from(files).slice(0, 4 - this.listaNominas.length);
-  const startIndex = this.listaNominas.length;
+    const seleccionados = Array.from(files).slice(0, 4 - this.listaNominas.length);
+    const startIndex = this.listaNominas.length;
 
-  const nuevos = seleccionados.map(() => ({ file: null, preview: '', cargando: true }));
-  this.listaNominas = [...this.listaNominas, ...nuevos];
+    const nuevos = seleccionados.map(() => ({ file: null, preview: '', cargando: true }));
+    this.listaNominas = [...this.listaNominas, ...nuevos];
 
-  for (let i = 0; i < seleccionados.length; i++) {
-    const dataUrl = await this.comprimirImagen(seleccionados[i]);
-    this.listaNominas[startIndex + i] = { 
-      file: seleccionados[i], 
-      preview: dataUrl, 
-      cargando: false 
-    };
-    this.cdr.detectChanges();
+    for (let i = 0; i < seleccionados.length; i++) {
+      const dataUrl = await this.comprimirImagen(seleccionados[i]);
+      this.listaNominas[startIndex + i] = { 
+        file: seleccionados[i], 
+        preview: dataUrl, 
+        cargando: false 
+      };
+      this.cdr.detectChanges();
+    }
   }
-}
 
-actualizarTodoPorGrupo() {
-  // Guardamos el nuevo grupo en el LocalStorage para que no se pierda al recargar
-  localStorage.setItem('usuarioLogueado', JSON.stringify(this.usuarioLogueado));
-
-  // Refrescamos todos los cálculos de la tabla de resultados
-  if (this.resultados.length > 0) {
-    this.resultados = this.resultados.map(res => this.procesarDatosIA(res));
-    this.actualizarTotalesGlobales();
+  actualizarTodoPorGrupo() {
+    localStorage.setItem('usuarioLogueado', JSON.stringify(this.usuarioLogueado));
+    if (this.resultados.length > 0) {
+      this.resultados = this.resultados.map(res => this.procesarDatosIA(res));
+      this.actualizarTotalesGlobales();
+    }
   }
-}
 
   private comprimirImagen(file: File): Promise<string> {
     return new Promise((resolve) => {
@@ -109,86 +115,69 @@ actualizarTodoPorGrupo() {
     });
   }
 
-  // --- LÓGICA DE ANÁLISIS ---
   async analizarNominas() {
-  if (this.listaNominas.length === 0) return;
-  
-  this.analizando = true;
-  this.mostrarResultados = true; 
+    if (this.listaNominas.length === 0) return;
+    this.analizando = true;
+    this.mostrarResultados = true; 
 
-  for (let i = 0; i < this.listaNominas.length; i++) {
-    this.indiceAnalizando = i + 1;
-    this.cdr.detectChanges();
-
-    try {
-      const datos = await this.iaService.escanearNomina(this.listaNominas[i].preview);
-      
-      if (datos) {
-    const nuevoResultado = this.procesarDatosIA(datos);
-    // En lugar de this.resultados.push, usamos spread para disparar la detección de cambios
-    this.resultados = [...this.resultados, nuevoResultado];
-}
-    } catch (error) {
-      console.error("Error", error);
+    for (let i = 0; i < this.listaNominas.length; i++) {
+      this.indiceAnalizando = i + 1;
+      this.cdr.detectChanges();
+      try {
+        const datos = await this.iaService.escanearNomina(this.listaNominas[i].preview);
+        if (datos) {
+          const nuevoResultado = this.procesarDatosIA(datos);
+          this.resultados = [...this.resultados, nuevoResultado];
+        }
+      } catch (error) {
+        console.error("Error", error);
+      }
     }
+    this.listaNominas = []; 
+    this.actualizarTotalesGlobales();
+    this.analizando = false;
+    this.cdr.detectChanges();
   }
 
-  // Vaciamos las fotos de arriba para poder subir las siguientes 4
-  this.listaNominas = []; 
-  this.actualizarTotalesGlobales();
-  this.analizando = false;
-  this.cdr.detectChanges();
-}
+  procesarDatosIA(datos: any) {
+    const anioUso = (datos.anio >= 2022 && datos.anio <= 2025) ? datos.anio : 2022;
+    const grupoActual = this.usuarioLogueado?.grupo || 'G4';
+    const grupoDoc = this.iaService.tablasSalariales.find(t => t.grupo === grupoActual);
+    let salarioBaseConvenio = 0;
 
-
-  // 1. Configuración de año y grupo [cite: 2026-01-25]
- procesarDatosIA(datos: any) {
-  const anioUso = (datos.anio >= 2022 && datos.anio <= 2025) ? datos.anio : 2022;
-  const grupoActual = this.usuarioLogueado?.grupo || 'G4';
-
-  const grupoDoc = this.iaService.tablasSalariales.find(t => t.grupo === grupoActual);
-  let salarioBaseConvenio = 0;
-
-  if (grupoDoc && grupoDoc.subgrupos && grupoDoc.subgrupos.length > 0) {
-      // Usamos el primer subgrupo para obtener el s2022 base y aplicamos la subida anual
+    if (grupoDoc && grupoDoc.subgrupos && grupoDoc.subgrupos.length > 0) {
       const base2022 = (grupoDoc.subgrupos[0] as any).s2022 || 0;
       salarioBaseConvenio = this.iaService.getSalarioDiaAnio(base2022, anioUso);
     }
   
-  // 1. Normalización total de textos (IA suele devolver 'Extra Marzo' o 'Mes Octubre')
-  const textoIdentificador = `${datos.nombreTipo || ''} ${datos.mes || ''}`.toUpperCase();
-  
-  // 2. Definición de Reglas Fijas
-  const esOctubre = textoIdentificador.includes('OCTUBRE');
-  const esExtraMarzo = textoIdentificador.includes('MARZO');
-  const esExtraJulio = textoIdentificador.includes('JULIO');
-  const esExtraDiciembre = textoIdentificador.includes('DICIEMBRE');
-  
-  // Es extra si lo dice el texto O si estamos en uno de tus meses clave
-  let esExtra = textoIdentificador.includes('EXTRA') || textoIdentificador.includes('PAGA') || 
-                esExtraMarzo || esExtraJulio || esExtraDiciembre || (esOctubre && parseFloat(datos.salarioBase) < 1000);
-
-  // 3. Asignación de Multiplicador y Nombre Elegante
-  let multiplicador = 1;
-  let nombreFinal = datos.nombreTipo || `MES ${datos.mes}`;
-
-  if (esExtra) {
-    if (esOctubre) {
-      multiplicador = 0.5;
-      nombreFinal = "EXTRA Octubre (50%)";
-    } else if (esExtraMarzo) {
-      nombreFinal = "EXTRA Marzo (100%)";
-    } else if (esExtraJulio) {
-      nombreFinal = "EXTRA Julio (100%)";
-    } else if (esExtraDiciembre) {
-      nombreFinal = "EXTRA Diciembre (100%)";
-    } else {
-      nombreFinal = `PAGA EXTRA`; // Genérico si no detecta el mes
-    }
-  }
-
-const salarioEsperadoBruto = salarioBaseConvenio * multiplicador;
+    const textoIdentificador = `${datos.nombreTipo || ''} ${datos.mes || ''}`.toUpperCase();
+    const esOctubre = textoIdentificador.includes('OCTUBRE');
+    const esExtraMarzo = textoIdentificador.includes('MARZO');
+    const esExtraJulio = textoIdentificador.includes('JULIO');
+    const esExtraDiciembre = textoIdentificador.includes('DICIEMBRE');
     
+    let esExtra = textoIdentificador.includes('EXTRA') || textoIdentificador.includes('PAGA') || 
+                  esExtraMarzo || esExtraJulio || esExtraDiciembre || (esOctubre && parseFloat(datos.salarioBase) < 1000);
+
+    let multiplicador = 1;
+    let nombreFinal = datos.nombreTipo || `MES ${datos.mes}`;
+
+    if (esExtra) {
+      if (esOctubre) {
+        multiplicador = 0.5;
+        nombreFinal = "EXTRA Octubre (50%)";
+      } else if (esExtraMarzo) {
+        nombreFinal = "EXTRA Marzo (100%)";
+      } else if (esExtraJulio) {
+        nombreFinal = "EXTRA Julio (100%)";
+      } else if (esExtraDiciembre) {
+        nombreFinal = "EXTRA Diciembre (100%)";
+      } else {
+        nombreFinal = `PAGA EXTRA`;
+      }
+    }
+
+    const salarioEsperadoBruto = salarioBaseConvenio * multiplicador;
     let porcentajeAnt = 0;
     if (this.usuarioLogueado?.fechaAlta) {
       porcentajeAnt = this.calcularCuatrienio(this.usuarioLogueado.fechaAlta, anioUso);
@@ -219,7 +208,7 @@ const salarioEsperadoBruto = salarioBaseConvenio * multiplicador;
     };
   }
 
- recalcularFila(index: number) {
+  recalcularFila(index: number) {
     this.resultados[index] = this.procesarDatosIA(this.resultados[index]);
     this.actualizarTotalesGlobales();
   }

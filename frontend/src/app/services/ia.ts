@@ -9,6 +9,7 @@ registerLocaleData(localeEs);
 
 @Injectable({ providedIn: 'root' })
 export class IaService {
+  
 
   
 
@@ -199,6 +200,14 @@ Devuelve SOLO JSON puro con este formato exacto:
   limpiarMemoria() {
     this.resultadosGuardados = [];
     this.totales = { bruto: 0, neto: 0 };
+  }
+
+  actualizarJornada(email: any, jornada: any) {
+      // Asegúrate de que la URL coincida con tu dominio de Railway
+      return this.http.put(`${this.backendUrl}api/usuarios/actualizar`, { 
+        email, 
+        jornada 
+    });
   }
 }
 

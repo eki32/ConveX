@@ -5,32 +5,16 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const app = express();
 
-// ✅ Configuración CORS CORREGIDA
-/*app.use(cors({
-    origin: [
-        'https://convex-app-kappa.vercel.app',
-        'https://convex-k0hdiejgs-ekaitzs-projects-43e98c06.vercel.app', // ⭐ Añadido
-        'http://localhost:4200',
-        'http://localhost:3000'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));*/
-
 app.use(express.json({ limit: '10mb' })); 
 
-
-// O MEJOR AÚN: Acepta todos los subdominios de Vercel (más flexible)
-
+// CORS: acepta .vercel.app y localhost
 app.use(cors({
     origin: function(origin, callback) {
-        // Permite requests sin origin (como Postman) o desde dominios permitidos
         if (!origin) return callback(null, true);
         
         const allowedDomains = [
-            /https:\/\/.*\.vercel\.app$/,  // ⭐ Cualquier subdominio .vercel.app
-            /http:\/\/localhost(:\d+)?$/   // localhost con cualquier puerto
+            /https:\/\/.*\.vercel\.app$/,
+            /http:\/\/localhost(:\d+)?$/
         ];
         
         const isAllowed = allowedDomains.some(pattern => pattern.test(origin));
@@ -46,10 +30,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-//app.use(express.json());
-
-
-// 🔥 IMPORTANTE: Ruta de health check ANTES de MySQL
+// Health check
 app.get('/', (req, res) => {
     res.json({ 
         message: 'API ConveX funcionando correctamente',
@@ -58,7 +39,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// 🔥 IMPORTANTE: Ruta de prueba de base de datos
 app.get('/health', (req, res) => {
     db.ping((err) => {
         if (err) {
@@ -96,14 +76,13 @@ db.connect(err => {
         console.error('Host:', process.env.DB_HOST);
         console.error('User:', process.env.DB_USER);
         console.error('Database:', process.env.DB_NAME);
-        // No detenemos el servidor si falla MySQL
         return;
     }
     console.log('✅ Conectado a MySQL');
     console.log('📊 Database:', process.env.DB_NAME);
 });
 
-
+// ─── REGISTRO ────────────────────────────────────────────────
 app.post('/registro', (req, res) => {
     const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
     const fechaLimpia = fechaAlta ? fechaAlta.split('T')[0] : null;
@@ -120,13 +99,11 @@ app.post('/registro', (req, res) => {
                 return res.status(400).json({ error: 'El email ya está registrado' });
             }
 
-            // 2. Encriptar la contraseña
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
 
             const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-            // NOTA: Aquí deberías usar 'hashedPassword' si quieres que se guarde encriptada
             db.query(query, [nombre, apellidos, email, hashedPassword, fechaLimpia, categoria, jornada || 40], (err, result) => {
                 if (err) {
                     console.error("❌ Error detallado:", err);
@@ -135,13 +112,67 @@ app.post('/registro', (req, res) => {
                 console.log(`✅ Usuario registrado: ${email}`);
                 res.status(200).json({ message: 'Usuario creado', id: result.insertId });
             });
-        }); // <-- Cierra el bloque db.query de checkQuery
-    } catch (error) { // <-- Aquí se cierra el try
+        });
+    } catch (error) {
         console.error("❌ Error en el servidor:", error);
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
+// ─── LOGIN (corregido: una sola respuesta) ──────────────────
+app.post('/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Email y contraseña son requeridos' 
+        });
+    }
+    
+    const query = "SELECT * FROM usuarios WHERE email = ?";
+
+    db.query(query, [email], async (err, result) => {
+        if (err) {
+            console.error("❌ Error en login:", err);
+            return res.status(500).json({ success: false, message: err.message });
+        }
+        
+        if (result.length === 0) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Email o contraseña incorrectos' 
+            });
+        }
+
+        try {
+            const match = await bcrypt.compare(password, result[0].password);
+            
+            if (match) {
+                const { password: _, ...userWithoutPassword } = result[0];
+                console.log(`✅ Login exitoso: ${email}`);
+                return res.json({ 
+                    success: true, 
+                    user: userWithoutPassword 
+                });
+            } else {
+                console.log(`❌ Intento de login fallido: ${email}`);
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Email o contraseña incorrectos' 
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error al comparar contraseñas:", error);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Error al verificar credenciales' 
+            });
+        }
+    });
+});
+
+// ─── ESCANEAR NÓMINA ─────────────────────────────────────────
 app.post('/api/escanear-nomina', async (req, res) => {
   const { base64Image } = req.body;
 
@@ -222,57 +253,27 @@ Devuelve SOLO JSON puro con este formato exacto:
   }
 });
 
+// ─── ACTUALIZAR JORNADA (corregido: usa db, no pool) ────────
+app.put('/api/usuarios/actualizar', (req, res) => {
+    const { email, jornada } = req.body;
 
-app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Email y contraseña son requeridos' 
-        });
+    if (!email || jornada === undefined) {
+        return res.status(400).json({ error: 'Email y jornada son requeridos' });
     }
-    
-    const query = "SELECT * FROM usuarios WHERE email = ?";
 
-    db.query(query, [email, password], async (err, result) => {
+    const query = 'UPDATE usuarios SET jornada = ? WHERE email = ?';
+
+    db.query(query, [jornada, email], (err, result) => {
         if (err) {
-            console.error("❌ Error en login:", err);
-            return res.status(500).json({ success: false, message: err.message });
-        }
-        
-        if (result.length > 0) {
-            res.json({ success: true, user: result[0] });
-        } else {
-            res.json({ success: false, message: 'Usuario no encontrado' });
-        }
-        try {
-            // Comparar la contraseña ingresada con el hash almacenado
-            const match = await bcrypt.compare(password, result[0].password);
-            
-            if (match) {
-                // ⚠️ IMPORTANTE: NO devolver la contraseña al cliente
-                const { password: _, ...userWithoutPassword } = result[0];
-                
-                console.log(`✅ Login exitoso: ${email}`);
-                res.json({ 
-                    success: true, 
-                    user: userWithoutPassword 
-                });
-            } else {
-                console.log(`❌ Intento de login fallido: ${email}`);
-                res.status(401).json({ 
-                    success: false, 
-                    message: 'Email o contraseña incorrectos' 
-                });
-            }
-        } catch (error) {
-            console.error("❌ Error al comparar contraseñas:", error);
-            res.status(500).json({ 
-                success: false, 
-                message: 'Error al verificar credenciales' 
-            });
+            console.error('❌ Error al actualizar jornada:', err);
+            return res.status(500).json({ error: err.message });
         }
 
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        console.log(`✅ Jornada actualizada para: ${email}`);
+        res.json({ success: true, message: 'Jornada actualizada correctamente' });
     });
 });

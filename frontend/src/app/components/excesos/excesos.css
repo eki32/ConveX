@@ -1,0 +1,16 @@
+/* Fuerza a que el input nunca mida más de lo que debe */
+.date-input-ajustado {
+    padding: 0.25rem 0.2rem !important;
+    font-size: 0.8rem !important;
+    height: 35px !important;
+    width: 100% !important;
+    min-width: 0 !important; /* Permite que el flex-item se encoja */
+}
+
+/* En móviles muy estrechos, ocultamos el icono nativo si estorba */
+@media (max-width: 576px) {
+    .date-input-ajustado::-webkit-calendar-picker-indicator {
+        margin-left: -5px;
+        width: 15px;
+    }
+}

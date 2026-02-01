@@ -4,7 +4,13 @@
       <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 20px;">
         <div class="text-center mb-3">
           <div class="avatar-placeholder mx-auto mb-2" style="background: #003366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            @if (usuarioLogueado?.nombre) {
+              <span class="text-white fw-bold" style="font-size: 1.8rem; text-transform: uppercase;">
+                {{ usuarioLogueado.nombre.charAt(0) }}
+              </span>
+            } @else {
             <i class="bi bi-person-fill text-white fs-1"></i>
+            }
           </div>
           <h5 class="fw-bold text-dark mb-0">{{ usuarioLogueado?.nombre }}</h5>
           <div class="d-flex justify-content-center mt-2">
@@ -63,7 +69,8 @@
               {{ listaNominas.length >= 4 ? 'Límite de ráfaga alcanzado' : 'Subir nóminas (Máx. 4 por vez)' }}
             </p>
             <span class="badge rounded-pill bg-light text-dark border">{{ listaNominas.length }} / 4 pendientes</span>
-          </div>
+        </div>
+
         @if (listaNominas.length > 0) {
           <div class="row g-3 mt-3">
             @for (item of listaNominas; track $index) {
@@ -105,6 +112,7 @@
             </div>
             <button (click)="limpiarTodo()" class="btn btn-sm btn-outline-light rounded-pill px-3">Nueva consulta</button>
           </div>
+          
           <div class="card-body p-4 p-md-5">
             <div class="row mb-5">
               <div class="col-md-6">
@@ -132,27 +140,27 @@
                   </tr>
                 </thead>
                 <tbody class="border-0">
-  @for (res of resultados; track $index) {
-    <tr [style.background-color]="res.esExtra ? '#fffaf5' : 'transparent'" style="transition: all 0.2s ease;">
-      <td class="ps-4 py-3">
-        <div class="d-flex flex-column">
-          <select class="form-select form-select-sm border-0 bg-light fw-bold mb-1" [(ngModel)]="res.anio" (change)="recalcularFila($index)" style="width: fit-content; font-size: 0.75rem;">
-            <option [ngValue]="2022">2022</option>
-            <option [ngValue]="2023">2023</option>
-            <option [ngValue]="2024">2024</option>
-            <option [ngValue]="2025">2025</option>
-          </select>
-          <input type="text" class="form-control form-control-sm border-0 fw-bold p-0 bg-transparent" [(ngModel)]="res.nombreTipo" (blur)="recalcularFila($index)" [style.color]="res.esExtra ? '#f37021' : '#003366'" style="box-shadow: none; font-size: 0.85rem;">
-        </div>
-      </td>
-      <td class="text-center">
-        <div class="d-inline-flex flex-column align-items-center">
-          <div class="input-group input-group-sm shadow-sm" style="width: 105px;">
-            <input type="number" class="form-control text-center fw-bold border-0" [class.text-danger]="res.salarioBase < 1000 && !res.esOctubre50" [(ngModel)]="res.salarioBase" (change)="recalcularFila($index)" style="background: #f8f9fa; border-radius: 8px;">
-            <span class="input-group-text bg-transparent border-0 ps-0">€</span>
-          </div>
-          @if (res.salarioBase < 1000 && !res.esOctubre50) {
-            <small class="text-warning fw-bold mt-1" style="font-size: 0.6rem;"><i class="bi bi-exclamation-triangle-fill"></i> ¿Falta el 1?</small>
+                  @for (res of resultados; track $index) {
+                    <tr [style.background-color]="res.esExtra ? '#fffaf5' : 'transparent'" style="transition: all 0.2s ease;">
+                      <td class="ps-4 py-3">
+                        <div class="d-flex flex-column">
+                          <select class="form-select form-select-sm border-0 bg-light fw-bold mb-1" [(ngModel)]="res.anio" (change)="recalcularFila($index)" style="width: fit-content; font-size: 0.75rem;">
+                            <option [ngValue]="2022">2022</option>
+                            <option [ngValue]="2023">2023</option>
+                            <option [ngValue]="2024">2024</option>
+                            <option [ngValue]="2025">2025</option>
+                          </select>
+                          <input type="text" class="form-control form-control-sm border-0 fw-bold p-0 bg-transparent" [(ngModel)]="res.nombreTipo" (blur)="recalcularFila($index)" [style.color]="res.esExtra ? '#f37021' : '#003366'" style="box-shadow: none; font-size: 0.85rem;">
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <div class="d-inline-flex flex-column align-items-center">
+                          <div class="input-group input-group-sm shadow-sm" style="width: 105px;">
+                            <input type="number" class="form-control text-center fw-bold border-0" [class.text-danger]="res.salarioBase < 1000 && !res.esOctubre50" [(ngModel)]="res.salarioBase" (change)="recalcularFila($index)" style="background: #f8f9fa; border-radius: 8px;">
+                            <span class="input-group-text bg-transparent border-0 ps-0">€</span>
+                          </div>
+                          @if (res.salarioBase < 1000 && !res.esOctubre50) {
+                            <small class="text-warning fw-bold mt-1" style="font-size: 0.6rem;"><i class="bi bi-exclamation-triangle-fill"></i> ¿Falta el 1?</small>
                           }
                         </div>
                       </td>
@@ -187,11 +195,13 @@
                 </tbody>
               </table>
             </div>
+
             <div class="d-flex justify-content-center mb-4">
               <button class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-sm" (click)="subirParaMas()">
                 <i class="bi bi-plus-circle-fill me-2"></i> Añadir más nóminas al informe
               </button>
             </div>
+
             <div class="row justify-content-end">
               <div class="col-md-6">
                 <div class="p-4 rounded-4 text-white shadow" style="background: linear-gradient(135deg, #003366 0%, #00509e 100%); border-left: 8px solid #f37021;">
@@ -205,12 +215,25 @@
                       <h2 class="fw-bold mb-0">{{ totalNetoEstimado | number:'1.2-2' }}€</h2>
                     </div>
                   </div>
+                  <div class="mt-3 pt-2 border-top border-white border-opacity-10 text-center">
+                    <p class="mb-0 opacity-75" style="font-size: 0.75rem;">
+                      * El neto incluye el descuento de <strong>{{ irpfManual }}% IRPF</strong> introducido y el <strong>6.45% de Seguridad Social</strong> estándar.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-</div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="alert border-0 shadow-sm d-flex align-items-center" style="background-color: #fffde7; color: #856404; border-radius: 12px; padding: 1rem 1.5rem;">
+                  <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
+                  <span style="font-size: 0.9rem; font-weight: 500;">
+                    Estos cálculos son <strong>meramente orientativos</strong>. Consulte con su sección sindical para un análisis detallado.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div> </div> </div> </div> }
+</div> 

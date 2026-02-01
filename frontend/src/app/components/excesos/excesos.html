@@ -1,0 +1,119 @@
+<div class="container-fluid mt-4 animate__animated animate__fadeIn">
+  <div class="card shadow-sm border-0 p-3 p-md-4" style="border-radius: 20px;">
+    
+    <div class="d-flex align-items-center mb-4">
+      <div class="p-3 rounded-circle bg-primary bg-opacity-10 me-3">
+        <i class="bi bi-calendar-event-fill text-primary fs-3"></i>
+      </div>
+      <div>
+        <h4 class="fw-bold mb-0" style="color: #003366;">Panel de Control de Jornada</h4>
+        <p class="text-muted small mb-0">Cálculo de excesos y gestión de calendario (Convenio Bizkaia)</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="p-3 p-md-4 rounded-4 h-100 shadow-sm" style="background-color: #f8f9fa; border: 1px solid #eee;">
+          <h6 class="fw-bold text-muted text-uppercase mb-4" style="font-size: 0.75rem; letter-spacing: 1px;">Configuración de Contrato y Ausencias</h6>
+          
+          <div class="d-flex flex-wrap align-items-center mb-4 gap-2">
+            <label class="small fw-bold text-dark flex-grow-1 mb-0">Jornada Semanal (h)</label>
+            <div class="input-group input-group-sm" style="width: 200px; border-radius: 8px; overflow: hidden;">
+              <input type="number" class="form-control border-end-0 fw-bold text-center" [(ngModel)]="usuarioLogueado.jornadaContrato" (input)="ejecutarCalculo()">
+              <button class="btn btn-primary btn-sm fw-bold px-3" (click)="guardarJornada()" [disabled]="cargando">
+                {{ cargando ? '...' : 'Guardar' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="p-3 p-md-4 rounded-4 shadow-sm bg-white border mb-4">
+  <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size: 0.75rem;">Periodos de Vacaciones / Ausencias</h6>
+
+  <div class="mb-3">
+    <label class="small text-muted mb-1 d-block">Vacaciones Invierno</label>
+    <div class="row g-2 align-items-center">
+      <div class="col-5">
+        <input type="date" class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
+               [(ngModel)]="periodoInvierno.inicio" (change)="calcularDiasTotales()">
+      </div>
+      <div class="col-2 text-center small text-muted">al</div>
+      <div class="col-5">
+        <input type="date" class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
+               [(ngModel)]="periodoInvierno.fin" (change)="calcularDiasTotales()">
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="small text-muted mb-1 d-block">Vacaciones Verano</label>
+    <div class="row g-2 align-items-center">
+      <div class="col-5">
+        <input type="date" class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
+               [(ngModel)]="periodoVerano.inicio" (change)="calcularDiasTotales()">
+      </div>
+      <div class="col-2 text-center small text-muted">al</div>
+      <div class="col-5">
+        <input type="date" class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
+               [(ngModel)]="periodoVerano.fin" (change)="calcularDiasTotales()">
+      </div>
+    </div>
+  </div>
+
+  <div class="text-end">
+    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2" style="border-radius: 10px; font-size: 0.8rem;">
+      {{ diasVacaciones }} días detectados
+    </span>
+  </div>
+</div>
+
+          <div class="d-flex align-items-center mb-4">
+            <label class="small text-muted flex-grow-1 mb-0">Días de Baja Médica (Total días)</label>
+            <input type="number" class="form-control form-control-sm text-center fw-bold shadow-sm text-danger" [(ngModel)]="diasBaja" (input)="ejecutarCalculo()" style="width: 80px; border-radius: 8px;">
+          </div>
+
+          <div class="p-3 rounded-3 bg-white border d-flex justify-content-between align-items-center shadow-sm">
+            <span class="x-small text-muted fw-bold text-uppercase" style="font-size: 0.65rem;">Jornada Máxima {{ anioCalculo }}:</span>
+            <span class="badge bg-light text-dark border fw-bold">{{ jornadasMaximas[anioCalculo] }}h anuales</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="p-4 rounded-4 border-dashed h-100 d-flex flex-column justify-content-center align-items-center shadow-sm" 
+             style="border: 2px dashed #003366; background: #fff; min-height: 350px;">
+          
+          <h6 class="text-uppercase x-small fw-bold text-muted mb-3" style="letter-spacing: 2px;">Exceso Detectado</h6>
+          
+          <div class="d-flex align-items-baseline mb-4">
+            <span class="display-3 fw-bold text-primary">{{ excesoHoras }}</span>
+            <span class="h3 fw-bold text-primary ms-2 mb-0">h</span>
+          </div>
+          
+          <div class="p-4 rounded-4 shadow-sm w-75 text-center" style="background-color: #f37021; color: white;">
+            <p class="mb-1 x-small text-uppercase opacity-75 fw-bold">Días a compensar</p>
+            <h2 class="mb-0 fw-bold">{{ diasCompensacion }} días</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="p-4 rounded-4 bg-white border shadow-sm">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <h5 class="fw-bold mb-0" style="color: #003366;">
+              <i class="bi bi-calendar3 me-2"></i>Calendario Laboral Bizkaia {{ anioCalculo }}
+            </h5>
+            <span class="badge bg-warning text-dark">Festivos automáticos detectados</span>
+          </div>
+          
+          <div class="calendar-container bg-light rounded-3 p-5 text-center border">
+            <i class="bi bi-tools fs-1 text-muted mb-3 d-block"></i>
+            <p class="text-muted">Aquí renderizaremos el calendario interactivo para marcar los festivos y días de convenio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

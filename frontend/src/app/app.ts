@@ -5,9 +5,11 @@ import { NavbarComponent } from './components/navbar/navbar';
 import { IaService } from './services/ia';
 
 
+
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,NavbarComponent  , FormsModule, ],
+  imports: [RouterOutlet,NavbarComponent  , FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
