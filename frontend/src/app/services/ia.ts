@@ -174,7 +174,7 @@ Devuelve SOLO JSON puro con este formato exacto:
       console.log('📤 Enviando imagen al backend...');
 
       const resultado = await firstValueFrom(
-        this.http.post<any>(`${this.backendUrl}/api/escanear-nomina`, {
+        this.http.post<any>(`${this.backendUrl}api/escanear-nomina`, {
           base64Image: base64Image
         })
       );
