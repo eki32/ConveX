@@ -189,4 +189,357 @@ table {
   .table-responsive::-webkit-scrollbar-thumb:hover {
     background: #555;
   }
+}/* Estilo de botón resaltado para los años */
+.btn-tabla-naranja {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #f37021;
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(243, 112, 33, 0.2);
+  border: none;
+  text-align: center;
+}
+
+.btn-tabla-naranja:hover {
+  background-color: #d65d1a;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(243, 112, 33, 0.4);
+}
+
+.btn-tabla-naranja i {
+  font-size: 16px;
+  text-align: center;
+}
+
+.btn-tabla-roja {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: crimson;
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(237, 59, 32, 0.2);
+  border: none;
+}
+
+.btn-tabla-roja:hover {
+  background-color: crimson;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(237, 59, 32, 0.2);
+}
+
+.btn-tabla-roja i {
+  font-size: 16px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  min-width: 600px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0 0 15px 15px;
+}
+
+.table-responsive table {
+  min-width: 800px;
+  margin-bottom: 0;
+}
+
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+/* ========================================= */
+/* AJUSTES PARA MÓVIL */
+/* ========================================= */
+
+@media (max-width: 768px) {
+  
+  /* ===== CONTAINER AJUSTADO ===== */
+  .container {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ===== ALERTS COMPLETAMENTE AJUSTADOS ===== */
+  
+  /* Alert azul (Alimentación Bizkaia) */
+  .alert.alert-info {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Alert rojo (DIA Modelo A) */
+  .alert.alert-danger {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* Contenido del alert */
+  .alert .d-flex {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  /* Icono del alert */
+  .alert i.bi-info-circle-fill,
+  .alert i.bi-building-fill {
+    flex-shrink: 0 !important;
+    font-size: 1.5rem !important;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Contenedor de texto del alert */
+  .alert .d-flex > div {
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Título del alert */
+  .alert h5 {
+    font-size: 0.9rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    margin-bottom: 5px !important;
+  }
+
+  /* Párrafo del alert */
+  .alert p {
+    font-size: 0.8rem !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    margin-bottom: 0 !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Card header */
+  .card-header {
+    padding: 10px !important;
+  }
+
+  .card-header h4 {
+    font-size: 0.9rem !important;
+  }
+
+  .card-header .badge {
+    font-size: 0.7rem !important;
+  }
+
+  /* ===== TABLA: PRIMERA COLUMNA FIJA ===== */
+  
+  .table-responsive {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  /* Primera columna (Grupo) FIJA */
+  .table thead th:first-child,
+  .table tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    background-color: white;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Mantener fondos correctos para la primera columna */
+  
+  /* Para filas de grupo profesional (colspan) */
+  .table tbody tr.table-light td:first-child {
+    background-color: #f8f9fa !important;
+  }
+
+  /* Para filas amarillas (G4) */
+  .table tbody tr.table-warning td:first-child {
+    background-color: #fff3cd !important;
+  }
+
+  /* Para header con fondo secundario (tabla Bizkaia) */
+  .table thead.table-secondary th:first-child {
+    background-color: #e9ecef !important;
+  }
+
+  /* Para header con fondo claro (tabla DIA) */
+  .table thead.table-light th:first-child {
+    background-color: #f8f9fa !important;
+  }
+
+  /* Para filas normales */
+  .table tbody tr td:first-child {
+    background-color: white !important;
+  }
+
+  /* Para filas de grupo en tabla DIA (fondo rosa) */
+  .table tbody tr.table-light td {
+    background-color: #fff5f5 !important;
+  }
+
+  .table tbody tr.table-light td:first-child {
+    background-color: #fff5f5 !important;
+  }
+
+  /* ===== AJUSTES DE TAMAÑO ===== */
+  
+  /* Botones PDF más pequeños */
+  .btn-tabla-naranja, 
+  .btn-tabla-roja {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    border-radius: 8px !important;
+    gap: 3px !important;
+  }
+
+  .btn-tabla-naranja i,
+  .btn-tabla-roja i {
+    font-size: 10px !important;
+  }
+  
+  /* Celdas de tabla */
+  .table td, 
+  .table th {
+    padding: 10px 6px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Badges en tabla */
+  .table .badge {
+    font-size: 0.7rem !important;
+    padding: 3px 6px !important;
+  }
+
+  /* Textos en tabla */
+  .table .fw-bold {
+    font-size: 0.8rem !important;
+  }
+
+  .table small,
+  .table .text-muted {
+    font-size: 0.7rem !important;
+  }
+
+  /* ===== SCROLLBAR MÁS VISIBLE ===== */
+  
+  .table-responsive::-webkit-scrollbar {
+    height: 12px !important;
+  }
+
+  .table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+
+  .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* ===== MÁRGENES ===== */
+  .mt-5 {
+    margin-top: 2rem !important;
+  }
+
+  .pt-5 {
+    padding-top: 1rem !important;
+  }
+
+  .mt-4 {
+    margin-top: 1.5rem !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* ===== PANTALLAS MUY PEQUEÑAS ===== */
+
+@media (max-width: 375px) {
+  .container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .alert {
+    padding: 10px !important;
+  }
+
+  .alert h5 {
+    font-size: 0.85rem !important;
+  }
+
+  .alert p {
+    font-size: 0.75rem !important;
+  }
+
+  .table td, 
+  .table th {
+    padding: 8px 5px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .btn-tabla-naranja, 
+  .btn-tabla-roja {
+    padding: 3px 6px !important;
+    font-size: 0.65rem !important;
+  }
 }
