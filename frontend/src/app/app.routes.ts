@@ -4,6 +4,7 @@ import { InicioComponent } from './components/inicio/inicio';
 import { Convenios } from './components/convenios/convenios';
 import { Registro } from './components/registro/registro';
 import { ExcesosComponent } from './components/excesos/excesos';
+import { CalendarioComponent } from './components/calendario/calendario';
 
 
 export const routes: Routes = [
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'convenios', component: Convenios },
   { path: 'inicio', component: InicioComponent },
   { path: 'excesos', component: ExcesosComponent },
+  { path: 'calendario', component: CalendarioComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' } ,
   { path: '**', redirectTo: 'login'} // Redirección por defecto
 ];

@@ -2,12 +2,13 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IaService } from '../../services/ia';
+import { CalendarioComponent } from "../calendario/calendario";
 
 
 @Component({
   selector: 'app-excesos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, CalendarioComponent],
   templateUrl: './excesos.html'
 })
 export class ExcesosComponent implements OnInit {

@@ -1,0 +1,353 @@
+.calendario-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.calendario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #1e40af;
+}
+
+.calendario-header h2 {
+  font-size: 28px;
+  color: #1e3a8a;
+  margin: 0;
+  font-weight: 700;
+}
+
+.badge-festivos {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1e3a8a;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+/* Resumen anual */
+.resumen-anual {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.resumen-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e5e7eb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.resumen-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.resumen-numero {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.resumen-numero.festivo { color: #dc2626; }
+.resumen-numero.convenio { color: #f59e0b; }
+.resumen-numero.laborable { color: #059669; }
+.resumen-numero.total { color: #1e40af; }
+
+.resumen-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Leyenda */
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.muestra {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: inline-block;
+  border: 2px solid #d1d5db;
+}
+
+/* Grid de meses */
+.meses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+  align-items: start;
+}
+
+.mes-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.mes-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.mes-header {
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #3b82f6;
+}
+
+.mes-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Calendario del mes */
+.calendario-mes {
+  margin-bottom: 8px;
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 5px;
+}
+
+.dia-semana-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 11px;
+  color: #6b7280;
+  padding: 4px 0;
+}
+
+.dias-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.dias-grid > div {
+  min-height: 38px;
+  height: 38px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.dias-grid > div:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.numero-dia {
+  position: relative;
+  z-index: 1;
+}
+
+.indicador-festivo,
+.indicador-convenio {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.indicador-festivo {
+  color: #fbbf24;
+}
+
+.indicador-convenio {
+  color: #fff;
+  background: #f59e0b;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+}
+
+/* Tipos de días */
+.dia-vacio {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+.dia-laborable {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #d1fae5;
+}
+
+.dia-laborable:hover {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+.dia-festivo {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+  font-weight: 700;
+  cursor: default;
+}
+
+.dia-convenio {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+  font-weight: 600;
+}
+
+.dia-convenio:hover {
+  background: #fde68a;
+  border-color: #f59e0b;
+}
+
+.dia-fin-semana {
+  background: #f3f4f6;
+  color: #9ca3af;
+  cursor: default;
+}
+
+/* Lista de festivos del mes */
+.festivos-mes {
+  display: none; /* Ocultar lista de festivos para mantener altura uniforme */
+}
+
+.festivo-item {
+  display: flex;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 11px;
+  color: #4b5563;
+  line-height: 1.3;
+}
+
+.fecha-festivo {
+  font-weight: 700;
+  color: #dc2626;
+  min-width: 20px;
+  font-size: 11px;
+}
+
+.nombre-festivo {
+  flex: 1;
+}
+
+/* Nota informativa */
+.nota-info {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-left: 4px solid #3b82f6;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+
+.nota-info p {
+  margin: 8px 0;
+  color: #1e40af;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.nota-info p:first-child {
+  margin-top: 0;
+}
+
+.nota-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .calendario-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+
+  .meses-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumen-anual {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .leyenda {
+    gap: 12px;
+  }
+
+  .calendario-header h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendario-container {
+    padding: 15px;
+  }
+
+  .resumen-anual {
+    grid-template-columns: 1fr;
+  }
+
+  .dias-grid > div {
+    font-size: 12px;
+  }
+
+  .dia-semana-header {
+    font-size: 11px;
+  }
+}

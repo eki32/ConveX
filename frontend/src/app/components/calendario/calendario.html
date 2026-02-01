@@ -1,0 +1,89 @@
+<div class="calendario-container">
+  <div class="calendario-header">
+    <h2>Calendario Laboral Bizkaia {{ anio }}</h2>
+    <div class="badge-festivos">Festivos automáticos detectados</div>
+  </div>
+
+  <div class="resumen-anual">
+    <div class="resumen-card">
+      <div class="resumen-numero festivo">{{ totalFestivos }}</div>
+      <div class="resumen-label">Festivos Oficiales</div>
+    </div>
+    <div class="resumen-card">
+      <div class="resumen-numero convenio">{{ totalDiasConvenio }}</div>
+      <div class="resumen-label">Días Convenio</div>
+    </div>
+    <div class="resumen-card">
+      <div class="resumen-numero laborable">{{ totalLaborables }}</div>
+      <div class="resumen-label">Días Laborables</div>
+    </div>
+    <div class="resumen-card">
+      <div class="resumen-numero total">{{ 365 - totalFestivos - totalDiasConvenio - 52 }}</div>
+      <div class="resumen-label">Total L-S Laborables</div>
+    </div>
+  </div>
+
+  <div class="leyenda">
+    <div class="leyenda-item">
+      <span class="muestra dia-festivo"></span>
+      <span>Festivo Oficial</span>
+    </div>
+    <div class="leyenda-item">
+      <span class="muestra dia-convenio"></span>
+      <span>Día Convenio</span>
+    </div>
+    <div class="leyenda-item">
+      <span class="muestra dia-fin-semana"></span>
+      <span>Domingo</span>
+    </div>
+    <div class="leyenda-item">
+      <span class="muestra dia-laborable"></span>
+      <span>Laborable (L-S)</span>
+    </div>
+  </div>
+
+  <div class="meses-grid">
+    <div class="mes-card" *ngFor="let mes of meses">
+      <div class="mes-header">
+        <h3>{{ mes.nombre }}</h3>
+      </div>
+      
+      <div class="calendario-mes">
+        <div class="dias-semana">
+          <div class="dia-semana-header" *ngFor="let dia of diasSemana">
+            {{ dia }}
+          </div>
+        </div>
+        
+        <div class="dias-grid">
+          <div 
+            *ngFor="let dia of mes.dias"
+            [class]="obtenerClaseDia(dia)"
+            [title]="dia.descripcion || ''"
+            (click)="toggleDiaConvenio(dia)"
+          >
+            <span class="numero-dia" *ngIf="dia.dia > 0">{{ dia.dia }}</span>
+            <span class="indicador-festivo" *ngIf="dia.esFestivo">★</span>
+            <span class="indicador-convenio" *ngIf="dia.esDiaConvenio">C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de festivos del mes -->
+      <div class="festivos-mes" *ngIf="tieneFestivos(mes)">
+        <div class="festivo-item" *ngFor="let dia of mes.dias">
+          <ng-container *ngIf="dia.esFestivo || dia.esDiaConvenio">
+            <span class="fecha-festivo">{{ dia.dia }}</span>
+            <span class="nombre-festivo">{{ dia.descripcion }}</span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nota-info">
+    <p><strong>Nota:</strong> Este calendario muestra los festivos oficiales de Bizkaia para el sector de alimentación en 2025.</p>
+    <p>Los días marcados de lunes a sábado son laborables. Los domingos son descanso semanal.</p>
+    <p>Puedes hacer clic en días laborables para marcarlos como "Día de Convenio" si aplica.</p>
+  </div>
+</div>
