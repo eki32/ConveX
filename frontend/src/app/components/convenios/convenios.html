@@ -49,53 +49,30 @@
             </tr>
           </thead>
           <tbody>
-            <div class="table-responsive d-none d-md-block">
-  <table class="table table-hover align-middle">
-    </table>
-</div>
-
-<div class="d-block d-md-none">
-  @for (grupo of iaService.tablasSalariales; track grupo.grupo) {
-    <div class="bg-dark text-white p-2 mt-3 rounded-top">
-      <strong>Grupo Profesional {{ grupo.grupo }}</strong>
-    </div>
-    
-    @for (sub of grupo.subgrupos; track sub.oficio) {
-      <div class="card mb-2 border-0 shadow-sm" style="border-left: 5px solid #f37021 !important;">
-        <div class="card-body p-3">
-          <h6 class="fw-bold text-primary mb-1">{{ sub.oficio }}</h6>
-          <p class="small text-muted mb-2">{{ sub.desc }}</p>
-          
-          <div class="row g-2 text-center">
-            <div class="col-6">
-              <div class="p-2 border rounded bg-light">
-                <small class="d-block text-muted">2022</small>
-                <strong>{{ sub.s2022 | number:'1.2-2' }}€</strong>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-2 border rounded bg-light">
-                <small class="d-block text-muted">2023</small>
-                <strong>{{ (sub.s2022 * 1.035) | number:'1.2-2' }}€</strong>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-2 border rounded bg-light">
-                <small class="d-block text-muted">2024</small>
-                <strong>{{ (sub.s2022 * 1.035 * 1.031) | number:'1.2-2' }}€</strong>
-              </div>
-            </div>
-            <div class="col-6">
-              <div class="p-2 border rounded bg-warning-subtle">
-                <small class="d-block text-muted">2025 (Prev.)</small>
-                <strong>{{ (sub.s2022 * 1.035 * 1.031 * 1.03) | number:'1.2-2' }}€</strong>
-              </div>
-            </div>
-          </div>
-        </div>
+            @for (grupo of iaService.tablasSalariales; track grupo.grupo) {
+              <tr class="table-light">
+                <td colspan="5" class="fw-bold text-primary" style="background-color: #f8f9fa;">
+                  <i class="bi bi-arrow-right-short"></i> Grupo Profesional {{ grupo.grupo }}
+                </td>
+              </tr>
+              @for (sub of grupo.subgrupos; track sub.oficio) {
+                <tr [class.table-warning]="grupo.grupo === 'G4'">
+                  <td class="text-center"><span class="badge bg-dark">{{ grupo.grupo }}</span></td>
+                  <td>
+                    <div class="fw-bold">{{ sub.oficio }}</div>
+                    <small class="text-muted" style="font-size: 0.7rem;">{{ sub.desc }}</small>
+                  </td>
+                  <td class="text-center fw-bold">{{ sub.s2022 | number:'1.2-2' }}€</td>
+                  <td class="text-center text-muted">{{ (sub.s2022 * 1.035) | number:'1.2-2' }}€</td>
+                  <td class="text-center text-muted">{{ (sub.s2022 * 1.035 * 1.031) | number:'1.2-2' }}€</td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
       </div>
-    }
-  }
+    </div>
+  </div>
 </div>
 
 

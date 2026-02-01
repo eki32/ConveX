@@ -64,17 +64,15 @@
 }
 
 /* --- AJUSTES MÓVIL --- */
-@media (max-width: 767px) {
-  .card {
-    border-radius: 10px;
-  }
-  .card-body strong {
-    font-size: 1.1rem;
-    color: #333;
-  }
-  .bg-dark {
-    font-size: 0.9rem;
-    letter-spacing: 1px;
+@media (max-width: 768px) {
+  .btn-tabla-naranja, .btn-tabla-roja { padding: 4px 8px !important; font-size: 0.7rem !important; }
+  
+  /* Hacemos la columna de oficio un poco más estrecha en móvil para que quepa más contenido */
+  .table-responsive td:nth-child(2), 
+  .table-responsive th:nth-child(2) {
+    max-width: 150px;
+    white-space: normal; /* Permite que el texto del oficio rompa en varias líneas */
+    font-size: 0.8rem;
   }
 }
 
