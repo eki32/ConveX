@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
-
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 registerLocaleData(localeEs);
 
@@ -90,14 +91,11 @@ getSalarioDiaAnio(base2022: number, anio: number): number {
 
   // API Key correcta
   public resultadosGuardados: any[] = [];
-  
-  
   public totales = { bruto: 0, neto: 0 };
-  
-  private backendUrl = 'convex-production.up.railway.app/api/escanear-nomina';
+  private backendUrl = 'convex-production.up.railway.app';
 
   // ✅ Modelo que SÍ tienes disponible
-  private apiUrl =
+ /* private apiUrl =
     'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
   async escanearNomina(base64Image: string) {
@@ -166,6 +164,35 @@ Devuelve SOLO JSON puro con este formato exacto:
 
     } catch (error) {
       console.error('Error en el proceso:', error);
+      return null;
+    }
+  }*/
+    constructor(private http: HttpClient) {}
+
+    async escanearNomina(base64Image: string) {
+    try {
+      console.log('📤 Enviando imagen al backend...');
+
+      const resultado = await firstValueFrom(
+        this.http.post<any>(`${this.backendUrl}/api/escanear-nomina`, {
+          base64Image: base64Image
+        })
+      );
+
+      console.log('✅ Respuesta recibida:', resultado);
+      return resultado;
+
+    } catch (error: any) {
+      console.error('❌ Error al escanear nómina:', error);
+      
+      if (error.status === 0) {
+        console.error('Error de red: No se pudo conectar al backend');
+      } else if (error.status === 400) {
+        console.error('Error 400: Imagen no válida');
+      } else if (error.status === 500) {
+        console.error('Error 500: Error en el servidor');
+      }
+      
       return null;
     }
   }
