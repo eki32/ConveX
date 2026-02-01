@@ -1,7 +1,11 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FESTIVOS_BIZKAIA } from './festivos-config'; 
+
+
+
+
 
 interface DiaCalendario {
   fecha: Date;
@@ -20,6 +24,8 @@ interface MesCalendario {
   numero: number;
   dias: DiaCalendario[];
 }
+
+
 
 @Component({
   selector: 'app-calendario',
@@ -51,6 +57,12 @@ export class CalendarioComponent implements OnInit {
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
+
+  @Output() datosCalendario = new EventEmitter<{
+  laborables: number,
+  festivosOficiales: number,
+  festivosConvenio: number
+}>();
 
   ngOnInit() {
     this.cargarFestivosDelAnio();
@@ -160,6 +172,8 @@ export class CalendarioComponent implements OnInit {
     return dias;
   }
 
+  
+
   formatearFecha(fecha: Date): string {
     const anio = fecha.getFullYear();
     const mes = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -167,7 +181,7 @@ export class CalendarioComponent implements OnInit {
     return `${anio}-${mes}-${dia}`;
   }
 
-  calcularTotales() {
+ calcularTotales() {
     this.totalFestivos = 0;
     this.totalLaborables = 0;
     this.totalDiasConvenio = 0;
@@ -180,6 +194,12 @@ export class CalendarioComponent implements OnInit {
           if (dia.esLaborable) this.totalLaborables++;
         }
       });
+    });
+
+    this.datosCalendario.emit({
+      laborables: this.totalLaborables,
+      festivosOficiales: this.festivosOficiales.length,
+      festivosConvenio: this.totalDiasConvenio 
     });
   }
 
