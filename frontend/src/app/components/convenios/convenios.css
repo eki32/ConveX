@@ -1,82 +1,100 @@
-/* --- BOTONES CONVEX --- */
-.btn-tabla-naranja, .btn-tabla-roja {
+/* Estilo de botón resaltado para los años */
+.btn-tabla-naranja {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
+  background-color: #f37021; /* El naranja de tu marca ConveX */
   color: white !important;
   border-radius: 12px;
   font-weight: 800;
   text-decoration: none;
+  font-size: 16px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(243, 112, 33, 0.2);
+  border: none;
+  text-align: center;
+}
+
+.btn-tabla-naranja:hover {
+  background-color: #d65d1a;
+  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(243, 112, 33, 0.4);
+}
+
+.btn-tabla-naranja i {
+  font-size: 16px;
+  text-align: center;
+}
+
+.btn-tabla-roja {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: crimson; /* El naranja de tu marca ConveX */
+  color: white !important;
+  border-radius: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(237, 59, 32, 0.2);
   border: none;
 }
-.btn-tabla-naranja { background-color: #f37021; box-shadow: 0 4px 10px rgba(243, 112, 33, 0.2); }
-.btn-tabla-roja { background-color: crimson; box-shadow: 0 4px 10px rgba(237, 59, 32, 0.2); }
 
-/* --- CONTENEDOR DE TABLA --- */
+.btn-tabla-roja:hover {
+  background-color: crimson;
+  transform: translateY(-3px); /* Efecto de salto al pasar el ratón */
+  box-shadow: 0 6px 15px rgba(237, 59, 32, 0.2);
+}
+
+.btn-tabla-roja i {
+  font-size: 16px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Crea scroll lateral si la tabla es muy grande */
+  -webkit-overflow-scrolling: touch; /* Hace que el scroll sea suave en iPhone */
+}
+
+table {
+  min-width: 600px; /* Obliga a la tabla a mantener un ancho mínimo para que sea legible */
+}
+
 .table-responsive {
   width: 100%;
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 0 0 15px 15px;
-  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Scroll suave tipo app nativa */
+  border-radius: 0 0 15px 15px; /* Bordes redondeados abajo para coincidir con la card */
 }
 
+/* Forzamos el ancho mínimo solo en las tablas de datos para que no se amontonen */
 .table-responsive table {
-  min-width: 900px !important; /* Aumentamos para que los años respiren */
-  border-collapse: separate !important; /* REQUERIDO PARA STICKY */
-  border-spacing: 0;
+  min-width: 800px; /* Un poco más de margen para que los nombres de oficio respiren */
+  margin-bottom: 0;
 }
 
-/* --- LOGICA DE COLUMNAS FIJAS --- */
-
-/* 1ª Columna: GRUPO (La dejamos fija a la izquierda) */
-.table-responsive th:nth-child(1),
-.table-responsive td:nth-child(1) {
-  position: sticky;
-  left: 0;
-  z-index: 20;
-  background-color: #f8f9fa !important;
-  width: 60px !important;
-  min-width: 60px !important;
-  border-right: 1px solid #dee2e6;
-}
-
-/* 2ª Columna: OFICIO (La fijamos justo después del Grupo) */
-.table-responsive th:nth-child(2),
-.table-responsive td:nth-child(2) {
-  position: sticky;
-  left: 60px; /* Se pega justo donde termina la primera columna */
-  z-index: 19;
-  background-color: #ffffff !important;
-  border-right: 3px solid #f37021; /* Línea naranja para marcar el límite */
-  box-shadow: 4px 0 8px rgba(0,0,0,0.1);
-}
-
-/* Ajuste de colores para headers */
-.table-secondary th:nth-child(1), .table-secondary th:nth-child(2) {
-  background-color: #e9ecef !important;
-}
-.table-dark th:nth-child(1), .table-dark th:nth-child(2) {
-  background-color: #212529 !important;
-  color: white;
-}
-
-/* --- AJUSTES MÓVIL --- */
+/* Ajuste de los botones PDF en móvil para que no ocupen tanto */
 @media (max-width: 768px) {
-  .btn-tabla-naranja, .btn-tabla-roja { padding: 4px 8px !important; font-size: 0.7rem !important; }
+  .btn-tabla-naranja, .btn-tabla-roja {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+  }
   
-  /* Hacemos la columna de oficio un poco más estrecha en móvil para que quepa más contenido */
-  .table-responsive td:nth-child(2), 
-  .table-responsive th:nth-child(2) {
-    max-width: 150px;
-    white-space: normal; /* Permite que el texto del oficio rompa en varias líneas */
-    font-size: 0.8rem;
+  /* Reducimos un poco el padding de las celdas en móvil */
+  .table td, .table th {
+    padding: 12px 8px !important;
   }
 }
 
-/* Estilo del scroll inferior */
-.table-responsive::-webkit-scrollbar { height: 8px; }
-.table-responsive::-webkit-scrollbar-thumb { background: #f37021; border-radius: 10px; }
-
+/* Estilo visual del scrollbar (opcional, para que se vea más moderno) */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
