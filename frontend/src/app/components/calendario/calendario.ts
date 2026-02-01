@@ -196,9 +196,10 @@ export class CalendarioComponent implements OnInit {
       });
     });
 
+    // ✅ CORRECCIÓN: Emitir los totales reales calculados
     this.datosCalendario.emit({
       laborables: this.totalLaborables,
-      festivosOficiales: this.festivosOficiales.length,
+      festivosOficiales: this.totalFestivos,  // ← Cambio aquí
       festivosConvenio: this.totalDiasConvenio 
     });
   }
