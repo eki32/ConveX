@@ -5,6 +5,9 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const app = express();
 
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
 // ✅ Configuración CORS CORREGIDA
 /*app.use(cors({
     origin: [
@@ -42,8 +45,6 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
-app.use(express.json());
 
 // 🔥 IMPORTANTE: Ruta de health check ANTES de MySQL
 app.get('/', (req, res) => {
@@ -97,6 +98,12 @@ db.connect(err => {
     }
     console.log('✅ Conectado a MySQL');
     console.log('📊 Database:', process.env.DB_NAME);
+
+
+    // ✅ Aumentar timeouts del servidor
+    server.timeout = 600000; // 10 minutos
+    server.keepAliveTimeout = 600000;
+    server.headersTimeout = 600000;
 });
 
 app.post('/registro', (req, res) => {
@@ -136,6 +143,32 @@ app.post('/registro', (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
+// server.js
+app.post('/api/escanear-nomina', async (req, res) => {
+  const { image } = req.body;
+  const KEY = process.env.GEMINI_API_KEY; // La que tienes en tu captura de Variables
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: "Extrae datos de nómina DIA en JSON: anio, mes, salarioBase, antiguedadPagada." },
+            { inline_data: { mime_type: "image/jpeg", data: image } }
+          ]
+        }]
+      })
+    });
+    const data = await response.json();
+    res.json(data);
+  } catch (e) {
+    res.status(500).send("Error procesando imagen");
+  }
+});
+
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;

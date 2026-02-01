@@ -5,6 +5,7 @@ import { registerLocaleData } from '@angular/common';
 
 registerLocaleData(localeEs);
 
+
 @Injectable({ providedIn: 'root' })
 export class IaService {
 
@@ -90,8 +91,10 @@ getSalarioDiaAnio(base2022: number, anio: number): number {
   // API Key correcta
   public resultadosGuardados: any[] = [];
   
+  
   public totales = { bruto: 0, neto: 0 };
-  private apiKey = 'AIzaSyDv1erJIKTU_VWSOSp_FkUfshz9tFsQBKM';
+  
+  private backendUrl = 'convex-production.up.railway.app/api/escanear-nomina';
 
   // ✅ Modelo que SÍ tienes disponible
   private apiUrl =
@@ -99,7 +102,8 @@ getSalarioDiaAnio(base2022: number, anio: number): number {
 
   async escanearNomina(base64Image: string) {
     try {
-      const base64Data = base64Image.includes(',')
+      const base64Data = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image
+      //const base64Data = base64Image.includes(',')
         ? base64Image.split(',')[1]
         : base64Image;
 
@@ -129,8 +133,34 @@ Devuelve SOLO JSON puro con este formato exacto:
         ]
       };
 
-      const response = await fetch(
-        `${this.apiUrl}?key=${this.apiKey}`,
+      const response = await fetch('https://convex-production.up.railway.app/api/escanear-nomina', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: base64Data })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error en el servidor Railway:', errorText);
+      return null;
+    }
+
+    const data = await response.json();
+    
+    // Gemini devuelve el texto en esta estructura
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) return null;
+
+    const limpio = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(limpio);
+  } catch (error) {
+    console.error('❌ Error de conexión:', error);
+    return null;
+  }
+}
+
+    /*  const response = await fetch(
+        `${this.apiUrl}?key=${this.backendUrl}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -162,7 +192,7 @@ Devuelve SOLO JSON puro con este formato exacto:
       console.error('Error en el proceso:', error);
       return null;
     }
-  }
+  }*/
   limpiarMemoria() {
     this.resultadosGuardados = [];
     this.totales = { bruto: 0, neto: 0 };

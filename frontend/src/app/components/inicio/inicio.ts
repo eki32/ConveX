@@ -56,6 +56,7 @@ datos: any;
 
   // --- GESTIÓN DE ARCHIVOS ---
   async onFilesSelected(event: any) {
+
   const files: FileList = event.target.files;
   if (!files || files.length === 0) return;
 
