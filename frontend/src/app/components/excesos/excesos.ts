@@ -162,34 +162,28 @@ export class ExcesosComponent implements OnInit {
     const horasDia = horasSemana / this.DIAS_SEMANA_LABORAL;
     console.log('PASO 3 - Horas por día:', horasDia.toFixed(2) + 'h');
 
-    // PASO 4: Días laborables efectivos (laborables - festivos)
-    this.diasLaborablesEfectivos = this.diasLaborables - this.festivosOficiales - this.festivosConvenio;
-    
-    // Si no tenemos datos del calendario, usar estimación
-    if (this.diasLaborables === 0) {
-      // Estimación: 306 días L-S en el año menos festivos promedio
-      const festivosTotales = this.festivosOficiales + this.festivosConvenio;
-      this.diasLaborablesEfectivos = 306 - (festivosTotales || 14);
-      console.log('PASO 4 - Usando estimación de días laborables');
-    }
-    
-    console.log('PASO 4 - Días laborables efectivos:', {
-      laborables: this.diasLaborables,
-      festivosOficiales: this.festivosOficiales,
-      festivosConvenio: this.festivosConvenio,
-      efectivos: this.diasLaborablesEfectivos
-    });
+    // PASO 4: Días laborables efectivos
+// El calendario ya envía los días laborables NETOS (sin festivos)
+    this.diasLaborablesEfectivos = this.diasLaborables;
 
-    // PASO 5: Días trabajados (laborables - vacaciones - bajas)
-    const diasAusencia = (this.diasVacaciones || 0) + (this.diasBaja || 0);
-    this.diasTrabajados = this.diasLaborablesEfectivos - diasAusencia;
-    console.log('PASO 5 - Días trabajados:', {
-      laborablesEfectivos: this.diasLaborablesEfectivos,
-      vacaciones: this.diasVacaciones,
-      bajas: this.diasBaja,
-      ausenciaTotal: diasAusencia,
-      trabajados: this.diasTrabajados
-    });
+      console.log('PASO 4 - Días laborables efectivos:', {
+        laborablesNetos: this.diasLaborables,
+        festivosOficiales: this.festivosOficiales,
+        festivosConvenio: this.festivosConvenio,
+        efectivos: this.diasLaborablesEfectivos
+      });
+
+        // PASO 5: Días trabajados (laborables - vacaciones - bajas)
+      const diasAusencia = (this.diasVacaciones || 0) + (this.diasBaja || 0);
+      this.diasTrabajados = this.diasLaborablesEfectivos - diasAusencia;
+
+      console.log('PASO 5 - Días trabajados:', {
+        laborablesEfectivos: this.diasLaborablesEfectivos,
+        vacaciones: this.diasVacaciones,
+        bajas: this.diasBaja,
+        ausenciaTotal: diasAusencia,
+        trabajados: this.diasTrabajados
+      });
 
     // PASO 6: Total horas realizadas
     this.totalHorasRealizadas = Math.round(this.diasTrabajados * horasDia);
