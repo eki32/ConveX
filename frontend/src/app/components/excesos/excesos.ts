@@ -27,8 +27,9 @@ export class ExcesosComponent implements OnInit {
 
   // Variables vinculadas al HTML
   usuarioLogueado: any = {
-    nombre: 'Ekaitz',
-    jornadaContrato: 40 
+    nombre: '',
+    email: '',
+    jornada: 40 
   };
 
   // Inputs de vacaciones y ausencias
@@ -91,12 +92,22 @@ private obtenerDiferencia(inicio: string, fin: string): number {
       const saved = localStorage.getItem('usuarioLogueado');
       if (saved) {
         const d = JSON.parse(saved);
-        if (d.jornadaContrato) this.usuarioLogueado.jornadaContrato = d.jornadaContrato;
+        
+        // CARGAR TODOS LOS DATOS DEL USUARIO LOGUEADO
+        this.usuarioLogueado = {
+          nombre: d.nombre || '',
+          email: d.email || '',
+          jornadaContrato: d.jornadaContrato || 40
+        };
+        
+        console.log('Usuario cargado:', this.usuarioLogueado); // Para debug
+      } else {
+        console.warn('No hay usuario logueado en localStorage');
+        // Opcional: redirigir al login si no hay usuario
       }
     }
     this.ejecutarCalculo();
   }
-
   /**
    * Calcula los días entre las dos fechas seleccionadas
    */
@@ -159,26 +170,34 @@ private obtenerDiferencia(inicio: string, fin: string): number {
   }
 
   async guardarJornada() {
-  this.cargando = true;
-  const email = this.usuarioLogueado.email;
-  const jornada = this.usuarioLogueado.jornadaContrato;
+    // VALIDACIÓN: Verificar que tenemos el email
+    if (!this.usuarioLogueado.email) {
+      alert('Error: No se pudo identificar al usuario. Por favor, inicia sesión nuevamente.');
+      return;
+    }
 
-  this.iaService.actualizarJornada(email, jornada).subscribe({
-    next: (res: any) => {
-      // Sincronizamos LocalStorage
-      const localData = JSON.parse(localStorage.getItem('usuarioLogueado') || '{}');
-      localData.jornadaContrato = jornada;
-      localStorage.setItem('usuarioLogueado', JSON.stringify(localData));
-      
-      this.cargando = false;
-      alert('¡Jornada guardada en la base de datos!');
-      this.cdr.detectChanges();
-    },
-    error: (err: any) => {
-      console.error(err);
-      this.cargando = false;
-      alert('Error al guardar en el servidor');
-      this.cdr.detectChanges();
+    this.cargando = true;
+    const email = this.usuarioLogueado.email;
+    const jornada = this.usuarioLogueado.jornadaContrato;
+
+    console.log('Guardando jornada:', { email, jornada }); // Para debug
+
+    this.iaService.actualizarJornada(email, jornada).subscribe({
+      next: (res: any) => {
+        // Sincronizamos LocalStorage
+        const localData = JSON.parse(localStorage.getItem('usuarioLogueado') || '{}');
+        localData.jornadaContrato = jornada;
+        localStorage.setItem('usuarioLogueado', JSON.stringify(localData));
+        
+        this.cargando = false;
+        alert('¡Jornada guardada en la base de datos!');
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        console.error('Error al guardar:', err);
+        this.cargando = false;
+        alert('Error al guardar en el servidor: ' + (err.error?.message || err.message));
+        this.cdr.detectChanges();
       }
     });
   }
