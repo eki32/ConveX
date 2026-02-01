@@ -133,33 +133,9 @@ Devuelve SOLO JSON puro con este formato exacto:
         ]
       };
 
-      const response = await fetch('https://convex-production.up.railway.app/api/escanear-nomina', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: base64Data })
-    });
+      
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error en el servidor Railway:', errorText);
-      return null;
-    }
-
-    const data = await response.json();
-    
-    // Gemini devuelve el texto en esta estructura
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) return null;
-
-    const limpio = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(limpio);
-  } catch (error) {
-    console.error('❌ Error de conexión:', error);
-    return null;
-  }
-}
-
-    /*  const response = await fetch(
+      const response = await fetch(
         `${this.apiUrl}?key=${this.backendUrl}`,
         {
           method: 'POST',
@@ -192,7 +168,7 @@ Devuelve SOLO JSON puro con este formato exacto:
       console.error('Error en el proceso:', error);
       return null;
     }
-  }*/
+  }
   limpiarMemoria() {
     this.resultadosGuardados = [];
     this.totales = { bruto: 0, neto: 0 };
