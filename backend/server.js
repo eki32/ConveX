@@ -104,6 +104,44 @@ db.connect(err => {
 });
 
 
+app.post('/registro', (req, res) => {
+    const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
+    const fechaLimpia = fechaAlta ? fechaAlta.split('T')[0] : null;
+
+    try {
+        const checkQuery = "SELECT email FROM usuarios WHERE email = ?";
+        db.query(checkQuery, [email], async (err, results) => {
+            if (err) {
+                console.error("❌ Error verificando email:", err);
+                return res.status(500).json({ error: 'Error al verificar email' });
+            }
+
+            if (results.length > 0) {
+                return res.status(400).json({ error: 'El email ya está registrado' });
+            }
+
+            // 2. Encriptar la contraseña
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+            const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            // NOTA: Aquí deberías usar 'hashedPassword' si quieres que se guarde encriptada
+            db.query(query, [nombre, apellidos, email, hashedPassword, fechaLimpia, categoria, jornada || 40], (err, result) => {
+                if (err) {
+                    console.error("❌ Error detallado:", err);
+                    return res.status(500).json({ error: err.sqlMessage });
+                }
+                console.log(`✅ Usuario registrado: ${email}`);
+                res.status(200).json({ message: 'Usuario creado', id: result.insertId });
+            });
+        }); // <-- Cierra el bloque db.query de checkQuery
+    } catch (error) { // <-- Aquí se cierra el try
+        console.error("❌ Error en el servidor:", error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 app.post('/api/escanear-nomina', async (req, res) => {
   const { base64Image } = req.body;
 
@@ -182,44 +220,6 @@ Devuelve SOLO JSON puro con este formato exacto:
     console.error('❌ Error en escanear-nomina:', error);
     res.status(500).json({ error: 'Error al procesar la solicitud' });
   }
-});
-
-app.post('/registro', (req, res) => {
-    const { nombre, apellidos, email, password, fechaAlta, categoria, jornada } = req.body;
-    const fechaLimpia = fechaAlta ? fechaAlta.split('T')[0] : null;
-
-    try {
-        const checkQuery = "SELECT email FROM usuarios WHERE email = ?";
-        db.query(checkQuery, [email], async (err, results) => {
-            if (err) {
-                console.error("❌ Error verificando email:", err);
-                return res.status(500).json({ error: 'Error al verificar email' });
-            }
-
-            if (results.length > 0) {
-                return res.status(400).json({ error: 'El email ya está registrado' });
-            }
-
-            // 2. Encriptar la contraseña
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-            const query = "INSERT INTO usuarios (nombre, apellidos, email, password, fecha_alta, categoria, jornada) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            // NOTA: Aquí deberías usar 'hashedPassword' si quieres que se guarde encriptada
-            db.query(query, [nombre, apellidos, email, hashedPassword, fechaLimpia, categoria, jornada || 40], (err, result) => {
-                if (err) {
-                    console.error("❌ Error detallado:", err);
-                    return res.status(500).json({ error: err.sqlMessage });
-                }
-                console.log(`✅ Usuario registrado: ${email}`);
-                res.status(200).json({ message: 'Usuario creado', id: result.insertId });
-            });
-        }); // <-- Cierra el bloque db.query de checkQuery
-    } catch (error) { // <-- Aquí se cierra el try
-        console.error("❌ Error en el servidor:", error);
-        res.status(500).json({ error: 'Error interno del servidor' });
-    }
 });
 
 
