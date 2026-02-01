@@ -27,7 +27,36 @@
     </form>
     
     <div class="login-footer">
-      ¿No tienes cuenta en la plataforma? <a routerLink="/registro">Crea una cuenta aquí</a>
+      ¿No tienes cuenta en la plataforma? <a href="#" (click)="$event.preventDefault(); mostrarModalCodigo = true">
+        <i class="bi bi-lock-fill me-1"></i>Crea una cuenta aquí
+      </a>
     </div>
   </div>
+  <!-- MODAL CÓDIGO -->
+    @if (mostrarModalCodigo) {
+      <div class="modal-overlay" (click)="cerrarModal($event)">
+        <div class="modal-codigo">
+          <div class="modal-codigo-icon">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <h5>Acceso restringido</h5>
+          <p>Introduce el código de autorización para crear una cuenta.</p>
+          <input type="password" 
+                 [(ngModel)]="codigoIntroducido" 
+                 name="codigo"
+                 placeholder="••••••••" 
+                 [class.input-error]="errorCodigo"
+                 (keyup.enter)="validarCodigo()">
+          @if (errorCodigo) {
+            <span class="error-codigo">
+              <i class="bi bi-x-circle-fill me-1"></i>Código incorrecto
+            </span>
+          }
+          <div class="modal-codigo-botones">
+            <button class="btn-modal-cancelar" (click)="cerrarModal()">Cancelar</button>
+            <button class="btn-modal-confirmar" (click)="validarCodigo()">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    }
 </div>

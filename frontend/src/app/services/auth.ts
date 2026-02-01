@@ -10,7 +10,7 @@ import { firstValueFrom } from 'rxjs'; // ✅ IMPORTACIÓN CORRECTA
 export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
-  private url='https://convex-production.up.railway.app/'
+ private url='https://convex-production.up.railway.app/'
 
 
   // Signal para gestionar el usuario en tiempo real
@@ -55,14 +55,20 @@ export class AuthService {
     }
 }
 
-  // Método para cerrar sesión y limpiar el Navbar
-  logout() {
-  this.currentUser.set(null); // ✅ Esto oculta el Navbar inmediatamente
-  if (isPlatformBrowser(this.platformId)) {
-    localStorage.removeItem('usuarioLogueado'); // ✅ Llave corregida
-    // Opcional: Redirigir al login
+async validarCodigoRegistro(codigo: string): Promise<any> {
+  try {
+    const urlCompleta = `${this.url}validar-codigo`; // ← SIN comillas extras
+    console.log('URL exacta:', urlCompleta);
+    
+    const response = await firstValueFrom(
+      this.http.post(urlCompleta, { codigo })
+    );
+    
+    return response;
+  } catch (error: any) {
+    console.error('Error:', error);
+    throw error;
   }
-}
-}
+}}
 
 export { isPlatformBrowser };
