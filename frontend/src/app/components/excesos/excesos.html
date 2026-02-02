@@ -1,44 +1,52 @@
 <div class="container-fluid mt-4 animate__animated animate__fadeIn">
-  <div class="card shadow-sm border-0 p-3 p-md-4" style="border-radius: 20px;">
-    
+  <div class="card shadow-sm border-0 p-3 p-md-4" style="border-radius: 20px">
     <!-- HEADER -->
     <div class="d-flex align-items-center mb-4">
       <div class="p-3 rounded-circle bg-primary bg-opacity-10 me-3">
         <i class="bi bi-calculator-fill text-primary fs-3"></i>
       </div>
       <div>
-        <h4 class="fw-bold mb-0" style="color: #003366;">Cálculo de Excesos de Jornada</h4>
-        <p class="text-muted small mb-0">VI Convenio Colectivo DIA {{anioCalculo}}</p>
+        <h4 class="fw-bold mb-0" style="color: #003366">Cálculo de Excesos de Jornada</h4>
+        <p class="text-muted small mb-0">VI Convenio Colectivo DIA {{ anioCalculo }}</p>
       </div>
     </div>
 
     <div class="row g-4">
-      
       <!-- COLUMNA IZQUIERDA: CONFIGURACIÓN -->
       <div class="col-lg-7">
-        <div class="p-3 p-md-4 rounded-4 h-100 shadow-sm" style="background-color: #f8f9fa; border: 1px solid #eee;">
-          
-          <h6 class="fw-bold text-muted text-uppercase mb-4" style="font-size: 0.75rem; letter-spacing: 1px;">
+        <div
+          class="p-3 p-md-4 rounded-4 h-100 shadow-sm"
+          style="background-color: #f8f9fa; border: 1px solid #eee"
+        >
+          <h6
+            class="fw-bold text-muted text-uppercase mb-4"
+            style="font-size: 0.75rem; letter-spacing: 1px"
+          >
             <i class="bi bi-gear-fill me-2"></i>Configuración
           </h6>
-          
+
           <!-- JORNADA SEMANAL -->
           <div class="d-flex flex-wrap align-items-center mb-4 gap-2">
             <label class="small fw-bold text-dark flex-grow-1 mb-0">
               <i class="bi bi-clock me-1"></i>Jornada Semanal (horas)
             </label>
-            <div class="input-group input-group-sm" style="width: 200px; border-radius: 8px; overflow: hidden;">
-              <input 
-                type="number" 
-                class="form-control border-end-0 fw-bold text-center" 
-                [(ngModel)]="usuarioLogueado.jornadaContrato" 
+            <div
+              class="input-group input-group-sm"
+              style="width: 200px; border-radius: 8px; overflow: hidden"
+            >
+              <input
+                type="number"
+                class="form-control border-end-0 fw-bold text-center"
+                [(ngModel)]="usuarioLogueado.jornadaContrato"
                 (input)="ejecutarCalculo()"
                 min="1"
-                max="40">
-              <button 
-                class="btn btn-primary btn-sm fw-bold px-3" 
-                (click)="guardarJornada()" 
-                [disabled]="cargando">
+                max="40"
+              />
+              <button
+                class="btn btn-primary btn-sm fw-bold px-3"
+                (click)="guardarJornada()"
+                [disabled]="cargando"
+              >
                 <i class="bi" [ngClass]="cargando ? 'bi-hourglass-split' : 'bi-save'"></i>
                 {{ cargando ? 'Guardando...' : 'Guardar' }}
               </button>
@@ -46,12 +54,17 @@
           </div>
 
           <!-- INDICADOR JORNADA PROPORCIONAL -->
-          <div class="alert alert-info p-3 mb-4 shadow-sm" style="font-size: 0.9rem; border-radius: 12px;">
+          <div
+            class="alert alert-info p-3 mb-4 shadow-sm"
+            style="font-size: 0.9rem; border-radius: 12px"
+          >
             <div class="d-flex align-items-center">
               <i class="bi bi-info-circle-fill fs-4 me-3"></i>
               <div>
-                <strong>Jornada máxima proporcional {{anioCalculo}}:</strong><br>
-                <span class="fs-5 fw-bold text-primary">{{ jornadaMaximaProporcional | number:'1.0-0' }}h</span>
+                <strong>Jornada máxima proporcional {{ anioCalculo }}:</strong><br />
+                <span class="fs-5 fw-bold text-primary"
+                  >{{ jornadaMaximaProporcional | number: '1.0-0' }}h</span
+                >
                 <span class="text-muted ms-2">({{ usuarioLogueado.jornadaContrato }}h/semana)</span>
               </div>
             </div>
@@ -59,7 +72,7 @@
 
           <!-- PERIODOS VACACIONALES -->
           <div class="p-3 p-md-4 rounded-4 shadow-sm bg-white border mb-4">
-            <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size: 0.75rem;">
+            <h6 class="fw-bold text-muted text-uppercase mb-3" style="font-size: 0.75rem">
               <i class="bi bi-calendar-heart me-2"></i>Periodos de Vacaciones
             </h6>
 
@@ -70,21 +83,23 @@
               </label>
               <div class="row g-2 align-items-center">
                 <div class="col-5">
-                  <input 
-                    type="date" 
-                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
-                    [(ngModel)]="periodoInvierno.inicio" 
-                    (change)="calcularDiasTotales()">
+                  <input
+                    type="date"
+                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado"
+                    [(ngModel)]="periodoInvierno.inicio"
+                    (change)="calcularDiasTotales()"
+                  />
                 </div>
                 <div class="col-2 text-center small text-muted">
                   <i class="bi bi-arrow-right"></i>
                 </div>
                 <div class="col-5">
-                  <input 
-                    type="date" 
-                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
-                    [(ngModel)]="periodoInvierno.fin" 
-                    (change)="calcularDiasTotales()">
+                  <input
+                    type="date"
+                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado"
+                    [(ngModel)]="periodoInvierno.fin"
+                    (change)="calcularDiasTotales()"
+                  />
                 </div>
               </div>
             </div>
@@ -96,28 +111,33 @@
               </label>
               <div class="row g-2 align-items-center">
                 <div class="col-5">
-                  <input 
-                    type="date" 
-                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
-                    [(ngModel)]="periodoVerano.inicio" 
-                    (change)="calcularDiasTotales()">
+                  <input
+                    type="date"
+                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado"
+                    [(ngModel)]="periodoVerano.inicio"
+                    (change)="calcularDiasTotales()"
+                  />
                 </div>
                 <div class="col-2 text-center small text-muted">
                   <i class="bi bi-arrow-right"></i>
                 </div>
                 <div class="col-5">
-                  <input 
-                    type="date" 
-                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado" 
-                    [(ngModel)]="periodoVerano.fin" 
-                    (change)="calcularDiasTotales()">
+                  <input
+                    type="date"
+                    class="form-control form-control-sm fw-bold shadow-sm date-input-ajustado"
+                    [(ngModel)]="periodoVerano.fin"
+                    (change)="calcularDiasTotales()"
+                  />
                 </div>
               </div>
             </div>
 
             <!-- Total días vacaciones -->
             <div class="text-end">
-              <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2" style="border-radius: 10px; font-size: 0.85rem;">
+              <span
+                class="badge bg-primary bg-opacity-10 text-primary px-3 py-2"
+                style="border-radius: 10px; font-size: 0.85rem"
+              >
                 <i class="bi bi-calendar-check me-1"></i>
                 {{ diasVacaciones }} días de vacaciones
               </span>
@@ -129,104 +149,126 @@
             <label class="small text-muted flex-grow-1 mb-0">
               <i class="bi bi-bandaid me-1"></i>Días de Baja Médica
             </label>
-            <input 
-              type="number" 
-              class="form-control form-control-sm text-center fw-bold shadow-sm text-danger" 
-              [(ngModel)]="diasBaja" 
-              (input)="ejecutarCalculo()" 
-              style="width: 100px; border-radius: 8px;"
+            <input
+              type="number"
+              class="form-control form-control-sm text-center fw-bold shadow-sm text-danger"
+              [(ngModel)]="diasBaja"
+              (input)="ejecutarCalculo()"
+              style="width: 100px; border-radius: 8px"
               min="0"
-              placeholder="0">
+              placeholder="0"
+            />
           </div>
 
           <!-- RESUMEN DATOS CALENDARIO -->
           <div class="p-3 rounded-3 bg-white border shadow-sm">
-            <span class="x-small text-muted fw-bold text-uppercase d-block mb-3" style="font-size: 0.7rem;">
+            <span
+              class="x-small text-muted fw-bold text-uppercase d-block mb-3"
+              style="font-size: 0.7rem"
+            >
               <i class="bi bi-calendar3 me-1"></i>Datos del Calendario {{ anioCalculo }}:
             </span>
             <div class="row g-2 small">
               <div class="col-6 col-md-4">
-                <div class="text-muted">Días laborables:</div>
-                <div class="fw-bold fs-6">{{ diasLaborables || '-' }}</div>
+                <div class="text-muted">Días totales año:</div>
+                <div class="fw-bold fs-6">{{ diasTotalesAnio || '-' }}</div>
               </div>
               <div class="col-6 col-md-4">
                 <div class="text-muted">Festivos oficiales:</div>
-                <div class="fw-bold fs-6 text-danger" >{{ festivosOficiales || '-' }}</div>
+                <div class="fw-bold fs-6 text-danger">{{ festivosOficiales || '-' }}</div>
               </div>
               <div class="col-6 col-md-4">
                 <div class="text-muted">Festivos convenio:</div>
-                <div class="fw-bold fs-6" style="color: #f39c12;">{{ festivosConvenio || '-' }}</div>
+                <div class="fw-bold fs-6" style="color: #f39c12">{{ festivosConvenio || '-' }}</div>
               </div>
               <div class="col-6 col-md-4">
-                <div class="text-muted">Efectivos:</div>
-                <div class="fw-bold fs-6 text-primary">{{ diasLaborablesEfectivos }}</div>
+                <div class="text-muted">Efectivos (L-S):</div>
+                <div class="fw-bold fs-6 text-primary">{{ diasLaborables || '-' }}</div>
               </div>
               <div class="col-6 col-md-4">
                 <div class="text-muted">Trabajados:</div>
-                <div class="fw-bold fs-6 text-success">{{ diasTrabajados }}</div>
+                <div class="fw-bold fs-6 text-success">
+                  {{ diasTrabajados || diasLaborables || '-' }}
+                </div>
               </div>
             </div>
-          </div>
 
+            <!-- Mostrar festivos en vacaciones si hay -->
+            <div *ngIf="festivosEnVacaciones > 0" class="alert alert-info mt-3 mb-0 py-2 small">
+              <i class="bi bi-gift me-1"></i>
+              <strong>¡Bonus!</strong> Hay {{ festivosEnVacaciones }} festivo(s) en tus vacaciones.
+              Te corresponden <strong>+{{ diasCompensacionVacaciones }} día(s)</strong> adicionales
+              de compensación.
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- COLUMNA DERECHA: RESULTADOS -->
       <div class="col-lg-5">
-        <div class="p-4 rounded-4 border-dashed h-100 d-flex flex-column justify-content-center align-items-center shadow-sm" 
-             style="border: 2px dashed #003366; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); min-height: 400px;">
-          
+        <div
+          class="p-4 rounded-4 border-dashed h-100 d-flex flex-column justify-content-center align-items-center shadow-sm"
+          style="
+            border: 2px dashed #003366;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            min-height: 400px;
+          "
+        >
           <!-- TÍTULO -->
-          <h6 class="text-uppercase x-small fw-bold text-muted mb-3" style="letter-spacing: 2px;">
+          <h6 class="text-uppercase x-small fw-bold text-muted mb-3" style="letter-spacing: 2px">
             <i class="bi bi-graph-up-arrow me-2"></i>Exceso Detectado
           </h6>
-          
+
           <!-- EXCESO EN HORAS -->
           <div class="d-flex align-items-baseline mb-4">
-            <span class="display-2 fw-bold text-primary">{{ excesoHoras | number:'1.0-0' }}</span>
+            <span class="display-2 fw-bold text-primary">{{ excesoHoras | number: '1.0-0' }}</span>
             <span class="h2 fw-bold text-primary ms-2 mb-0">h</span>
           </div>
-          
+
           <!-- BOTÓN NARANJA CON DÍAS E IMPORTE -->
-          <div class="w-100 p-4 rounded-4 shadow-lg text-white" 
-               style="background: linear-gradient(135deg, #61d1e7 0%, #316bbb 100%);">
-            
+          <div
+            class="w-100 p-4 rounded-4 shadow-lg text-white"
+            style="background: linear-gradient(135deg, #61d1e7 0%, #316bbb 100%)"
+          >
             <!-- Días a compensar -->
-            <div class="text-center mb-3 pb-3" style="border-bottom: 2px solid rgba(255,255,255,0.3);">
-              <p class="mb-1 x-small text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">
+            <div
+              class="text-center mb-3 pb-3"
+              style="border-bottom: 2px solid rgba(255, 255, 255, 0.3)"
+            >
+              <p class="mb-1 x-small text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px">
                 <i class="bi bi-calendar-day me-1"></i>Días a Compensar
               </p>
-              <h1 class="mb-0 fw-bold" style="font-size: 2.5rem;">
-                {{ diasCompensacion | number:'1.1-1' }}
+              <h1 class="mb-0 fw-bold" style="font-size: 2.5rem">
+                {{ diasCompensacion | number: '1.1-1' }}
               </h1>
               <small class="opacity-75">días de descanso</small>
             </div>
-            
+
             <!-- Valor monetario -->
             <div class="text-center">
-              <p class="mb-1 x-small text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px;">
+              <p class="mb-1 x-small text-uppercase opacity-75 fw-bold" style="letter-spacing: 1px">
                 <i class="bi bi-currency-euro me-1"></i>Valor Monetario
               </p>
-              <h2 class="mb-1 fw-bold" style="font-size: 2rem;">
-                {{ importeMonetario | number:'1.2-2' }} €
+              <h2 class="mb-1 fw-bold" style="font-size: 2rem">
+                {{ importeMonetario | number: '1.2-2' }} €
               </h2>
               <small class="opacity-75 d-block">
                 <i class="bi bi-info-circle me-1"></i>
-                Hora extra: {{ valorHoraExtra | number:'1.2-2' }}€ (+50% según Art. 31)
+                Hora extra: {{ valorHoraExtra | number: '1.2-2' }}€ (+50% según Art. 31)
               </small>
             </div>
-            
           </div>
 
-
           <!-- AVISO FESTIVOS LOCALES -->
-          <div class="w-100 mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
-               style="background-color: #fff3cd; border: 1px solid #ffc107;">
+          <div
+            class="w-100 mt-3 p-3 rounded-3 d-flex align-items-start gap-2"
+            style="background-color: #fff3cd; border: 1px solid #ffc107"
+          >
             <i class="bi bi-exclamation-triangle-fill text-warning fs-5 flex-shrink-0 mt-1"></i>
             <div class="small text-dark">
-              <strong>Recuerda:</strong> Añade los <strong>festivos locales de tu municipio</strong> 
-              en el calendario de abajo para que el cálculo de excesos sea correcto. 
-              Puedes hacer clic en cualquier día laborable para marcarlo como festivo de convenio.
+              <strong>Recuerda:</strong> Añade los <strong>festivos locales de tu municipio</strong>
+              en el calendario de abajo para que el cálculo de excesos sea correcto. Puedes hacer
+              clic en cualquier día laborable para marcarlo como festivo de convenio.
             </div>
           </div>
 
@@ -234,22 +276,19 @@
           <div class="mt-4 text-center">
             <small class="text-muted">
               <i class="bi bi-shield-check me-1"></i>
-              Cálculo según VI Convenio Colectivo DIA {{anioCalculo}}
+              Cálculo según VI Convenio Colectivo DIA {{ anioCalculo }}
             </small>
           </div>
-
         </div>
       </div>
-
     </div>
 
     <!-- SECCIÓN CALENDARIO -->
     <div class="row mt-5">
       <div class="col-12">
         <div class="p-4 rounded-4 bg-white border shadow-sm">
-          
           <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-            <h5 class="fw-bold mb-0" style="color: #003366;">
+            <h5 class="fw-bold mb-0" style="color: #003366">
               <i class="bi bi-calendar3 me-2"></i>
               Calendario Laboral Bizkaia {{ anioCalculo }}
             </h5>
@@ -258,13 +297,11 @@
               Festivos detectados automáticamente
             </span>
           </div>
-          
+
           <!-- Componente de calendario -->
           <app-calendario (datosCalendario)="recibirDatosCalendario($event)"></app-calendario>
-          
         </div>
       </div>
     </div>
-
   </div>
 </div>

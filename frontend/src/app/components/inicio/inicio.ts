@@ -8,10 +8,9 @@ import { IaService } from '../../services/ia';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './inicio.html',
-  styleUrls: ['./inicio.css']
+  styleUrls: ['./inicio.css'],
 })
 export class InicioComponent implements OnInit {
-
   private iaService = inject(IaService);
   private cdr = inject(ChangeDetectorRef);
   private platformId = inject(PLATFORM_ID);
@@ -21,26 +20,30 @@ export class InicioComponent implements OnInit {
   // Mantenemos solo la referencia a las jornadas anuales por si las necesitas en el dashboard
   jornadasAnuales: any = {
     2024: 1714,
-    2025: 1710
+    2025: 1710,
   };
 
-  get resultados() { return this.iaService.resultadosGuardados; }
-  set resultados(val) { this.iaService.resultadosGuardados = val; }
+  get resultados() {
+    return this.iaService.resultadosGuardados;
+  }
+  set resultados(val) {
+    this.iaService.resultadosGuardados = val;
+  }
 
   usuarioLogueado: any;
-  listaNominas: { file: File | null, preview: string, cargando: boolean }[] = [];
+  listaNominas: { file: File | null; preview: string; cargando: boolean }[] = [];
   analizando = false;
   totalAtrasos: number = 0;
   totalNetoEstimado: number = 0;
   indiceAnalizando = 0;
   mostrarResultados = false;
-  irpfManual: number = 2; 
+  irpfManual: number = 2;
   anioActual = new Date().getFullYear();
 
   ngOnInit() {
     this.totalAtrasos = this.iaService.totales.bruto;
     this.totalNetoEstimado = this.iaService.totales.neto;
-    
+
     if (this.resultados.length > 0) {
       this.mostrarResultados = true;
     }
@@ -49,13 +52,13 @@ export class InicioComponent implements OnInit {
       const saved = localStorage.getItem('usuarioLogueado');
       if (saved) {
         const d = JSON.parse(saved);
-        this.usuarioLogueado = { 
-          nombre: d.nombre, 
-          grupo: d.categoria || 'G4', 
+        this.usuarioLogueado = {
+          nombre: d.nombre,
+          grupo: d.categoria || 'G4',
           fechaAlta: d.fecha_alta,
           email: d.email,
           // Añadimos la jornada aquí para que ExcesosComponent la lea correctamente
-          jornadaContrato: d.jornadaContrato || 40 
+          jornadaContrato: d.jornadaContrato || 40,
         };
       }
     }
@@ -77,10 +80,10 @@ export class InicioComponent implements OnInit {
 
     for (let i = 0; i < seleccionados.length; i++) {
       const dataUrl = await this.comprimirImagen(seleccionados[i]);
-      this.listaNominas[startIndex + i] = { 
-        file: seleccionados[i], 
-        preview: dataUrl, 
-        cargando: false 
+      this.listaNominas[startIndex + i] = {
+        file: seleccionados[i],
+        preview: dataUrl,
+        cargando: false,
       };
       this.cdr.detectChanges();
     }
@@ -89,7 +92,7 @@ export class InicioComponent implements OnInit {
   actualizarTodoPorGrupo() {
     localStorage.setItem('usuarioLogueado', JSON.stringify(this.usuarioLogueado));
     if (this.resultados.length > 0) {
-      this.resultados = this.resultados.map(res => this.procesarDatosIA(res));
+      this.resultados = this.resultados.map((res) => this.procesarDatosIA(res));
       this.actualizarTotalesGlobales();
     }
   }
@@ -118,7 +121,7 @@ export class InicioComponent implements OnInit {
   async analizarNominas() {
     if (this.listaNominas.length === 0) return;
     this.analizando = true;
-    this.mostrarResultados = true; 
+    this.mostrarResultados = true;
 
     for (let i = 0; i < this.listaNominas.length; i++) {
       this.indiceAnalizando = i + 1;
@@ -130,34 +133,39 @@ export class InicioComponent implements OnInit {
           this.resultados = [...this.resultados, nuevoResultado];
         }
       } catch (error) {
-        console.error("Error", error);
+        console.error('Error', error);
       }
     }
-    this.listaNominas = []; 
+    this.listaNominas = [];
     this.actualizarTotalesGlobales();
     this.analizando = false;
     this.cdr.detectChanges();
   }
 
   procesarDatosIA(datos: any) {
-    const anioUso = (datos.anio >= 2022 && datos.anio <= 2025) ? datos.anio : 2022;
+    const anioUso = datos.anio >= 2022 && datos.anio <= 2025 ? datos.anio : 2022;
     const grupoActual = this.usuarioLogueado?.grupo || 'G4';
-    const grupoDoc = this.iaService.tablasSalariales.find(t => t.grupo === grupoActual);
+    const grupoDoc = this.iaService.tablasSalariales.find((t) => t.grupo === grupoActual);
     let salarioBaseConvenio = 0;
 
     if (grupoDoc && grupoDoc.subgrupos && grupoDoc.subgrupos.length > 0) {
       const base2022 = (grupoDoc.subgrupos[0] as any).s2022 || 0;
       salarioBaseConvenio = this.iaService.getSalarioDiaAnio(base2022, anioUso);
     }
-  
+
     const textoIdentificador = `${datos.nombreTipo || ''} ${datos.mes || ''}`.toUpperCase();
     const esOctubre = textoIdentificador.includes('OCTUBRE');
     const esExtraMarzo = textoIdentificador.includes('MARZO');
     const esExtraJulio = textoIdentificador.includes('JULIO');
     const esExtraDiciembre = textoIdentificador.includes('DICIEMBRE');
-    
-    let esExtra = textoIdentificador.includes('EXTRA') || textoIdentificador.includes('PAGA') || 
-                  esExtraMarzo || esExtraJulio || esExtraDiciembre || (esOctubre && parseFloat(datos.salarioBase) < 1000);
+
+    let esExtra =
+      textoIdentificador.includes('EXTRA') ||
+      textoIdentificador.includes('PAGA') ||
+      esExtraMarzo ||
+      esExtraJulio ||
+      esExtraDiciembre ||
+      (esOctubre && parseFloat(datos.salarioBase) < 1000);
 
     let multiplicador = 1;
     let nombreFinal = datos.nombreTipo || `MES ${datos.mes}`;
@@ -165,13 +173,13 @@ export class InicioComponent implements OnInit {
     if (esExtra) {
       if (esOctubre) {
         multiplicador = 0.5;
-        nombreFinal = "EXTRA Octubre (50%)";
+        nombreFinal = 'EXTRA Octubre (50%)';
       } else if (esExtraMarzo) {
-        nombreFinal = "EXTRA Marzo (100%)";
+        nombreFinal = 'EXTRA Marzo (100%)';
       } else if (esExtraJulio) {
-        nombreFinal = "EXTRA Julio (100%)";
+        nombreFinal = 'EXTRA Julio (100%)';
       } else if (esExtraDiciembre) {
-        nombreFinal = "EXTRA Diciembre (100%)";
+        nombreFinal = 'EXTRA Diciembre (100%)';
       } else {
         nombreFinal = `PAGA EXTRA`;
       }
@@ -189,7 +197,7 @@ export class InicioComponent implements OnInit {
 
     const totalBrutoBizkaia = salarioEsperadoBruto + antEsperadaBruta;
     const diferenciaBruta = totalBrutoBizkaia - (pagadoBase + pagadoAnt);
-    const tasaDescuento = (this.irpfManual / 100) + 0.0645;
+    const tasaDescuento = this.irpfManual / 100 + 0.0645;
     const diferenciaNeta = diferenciaBruta * (1 - tasaDescuento);
 
     return {
@@ -204,7 +212,7 @@ export class InicioComponent implements OnInit {
       totalBrutoBizkaia: totalBrutoBizkaia,
       diferenciaBruta: diferenciaBruta,
       diferenciaNeta: diferenciaNeta,
-      esOctubre50: (esOctubre && multiplicador === 0.5)
+      esOctubre50: esOctubre && multiplicador === 0.5,
     };
   }
 
@@ -220,7 +228,7 @@ export class InicioComponent implements OnInit {
   }
 
   actualizarTodoPorIrpf() {
-    this.resultados = this.resultados.map(res => this.procesarDatosIA(res));
+    this.resultados = this.resultados.map((res) => this.procesarDatosIA(res));
     this.actualizarTotalesGlobales();
   }
 
@@ -232,13 +240,13 @@ export class InicioComponent implements OnInit {
   }
 
   getNetoConvenio(res: any): number {
-    const tasaDescuento = (this.irpfManual / 100) + 0.0645;
+    const tasaDescuento = this.irpfManual / 100 + 0.0645;
     return (res.salarioEsperado + res.antiguedadCalculada) * (1 - tasaDescuento);
   }
 
   get anhosFormateados(): string {
     if (!this.resultados.length) return '2022';
-    const anhos = [...new Set(this.resultados.map(r => r.anio))].sort();
+    const anhos = [...new Set(this.resultados.map((r) => r.anio))].sort();
     return anhos.length === 1 ? anhos[0].toString() : `${anhos[0]} - ${anhos[anhos.length - 1]}`;
   }
 
@@ -247,7 +255,7 @@ export class InicioComponent implements OnInit {
     if (isNaN(f.getTime())) return 0;
     const diferenciaAnios = anio - f.getFullYear();
     const tramos = Math.floor(diferenciaAnios / 4);
-    return Math.max(0, tramos * 5); 
+    return Math.max(0, tramos * 5);
   }
 
   eliminarNomina(index: number) {

@@ -40,16 +40,21 @@
 }
 
 @media (max-width: 600px) {
-  .navbar-brand { font-size: 1.2rem; }
-  .nav-link { font-size: 0.9rem; padding: 5px; }
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  .nav-link {
+    font-size: 0.9rem;
+    padding: 5px;
+  }
 }
- 
-  .nav-link { 
-    font-size: 0.9rem; 
-    padding: 5px; 
-  }
 
-  /* Botón Salir ocupa todo el ancho en móvil */
-  .navbar-collapse button {
-    width: 100%;
-  }
+.nav-link {
+  font-size: 0.9rem;
+  padding: 5px;
+}
+
+/* Botón Salir ocupa todo el ancho en móvil */
+.navbar-collapse button {
+  width: 100%;
+}

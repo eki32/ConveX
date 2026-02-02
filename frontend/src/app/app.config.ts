@@ -1,4 +1,9 @@
-import { ApplicationConfig, importProvidersFrom, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  LOCALE_ID,
+  provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
@@ -16,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     { provide: LOCALE_ID, useValue: 'es-ES' },
-    provideRouter(routes), provideClientHydration(withEventReplay())
-  ]
+    provideRouter(routes),
+    provideClientHydration(withEventReplay()),
+  ],
 };

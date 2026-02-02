@@ -1,12 +1,15 @@
 <div class="container mt-5 pt-5">
-  <div class="alert alert-info border-0 shadow-sm mb-4 p-4" style="border-radius: 15px; background-color: #eef2f7;">
+  <div
+    class="alert alert-info border-0 shadow-sm mb-4 p-4"
+    style="border-radius: 15px; background-color: #eef2f7"
+  >
     <div class="d-flex align-items-center">
-      <i class="bi bi-info-circle-fill fs-3 me-3" style="color: #003366;"></i>
+      <i class="bi bi-info-circle-fill fs-3 me-3" style="color: #003366"></i>
       <div>
-        <h5 class="fw-bold mb-1" style="color: #003366;">Convenio Colectivo Alimentación Bizkaia</h5>
-        <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-          Mínimos legales aplicables en la provincia. Si el salario de DIA es inferior a estos valores, 
-          tienes derecho a reclamar la diferencia.<br>
+        <h5 class="fw-bold mb-1" style="color: #003366">Convenio Colectivo Alimentación Bizkaia</h5>
+        <p class="mb-0 text-muted" style="font-size: 0.95rem">
+          Mínimos legales aplicables en la provincia. Si el salario de DIA es inferior a estos
+          valores, tienes derecho a reclamar la diferencia.<br />
           La antigüedad aquí sube un <strong>5% por cada cuatrienio</strong>.
         </p>
       </div>
@@ -14,7 +17,9 @@
   </div>
 
   <div class="card shadow-lg border-0">
-    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center p-3">
+    <div
+      class="card-header bg-dark text-white d-flex justify-content-between align-items-center p-3"
+    >
       <h4 class="mb-0">Tablas Salariales - Alimentación Bizkaia</h4>
       <span class="badge bg-warning text-dark">Mínimo Sectorial</span>
     </div>
@@ -23,48 +28,66 @@
         <table class="table table-hover mb-0 align-middle">
           <thead class="table-secondary">
             <tr class="text-center">
-              <th style="width: 100px;" class="text-center">Grupo</th>
+              <th style="width: 100px" class="text-center">Grupo</th>
               <th>Oficio / Categoría Provincial</th>
               <th class="text-center">
-              <!--<a href="http://localhost:4200/assets/docs/comercioAlimentacion2022.pdf" --> 
-              <a href="assets/docs/comercioAlimentacion2022.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="btn-tabla-naranja d-inline-flex align-items-center justify-content-center gap-1" 
-                style="text-decoration: none; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                2022 <i class="bi bi-file-pdf"></i>
-              </a>
-            </th>
+                <!--<a href="http://localhost:4200/assets/docs/comercioAlimentacion2022.pdf" -->
+                <a
+                  href="assets/docs/comercioAlimentacion2022.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-tabla-naranja d-inline-flex align-items-center justify-content-center gap-1"
+                  style="
+                    text-decoration: none;
+                    padding: 2px 10px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  2022 <i class="bi bi-file-pdf"></i>
+                </a>
+              </th>
               <th class="text-center">2023 (+3.5%)</th>
               <th class="text-center">
-              <!--<a href="http://localhost:4200/assets/docs/comercioAlimentacion2024.pdf" -->
-                <a href="assets/docs/comercioAlimentacion2024.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="btn-tabla-naranja d-inline-flex align-items-center justify-content-center gap-1" 
-                style="text-decoration: none; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                2024(+3,1%)<i class="bi bi-file-pdf"></i>
-              </a>
-            </th>
+                <!--<a href="http://localhost:4200/assets/docs/comercioAlimentacion2024.pdf" -->
+                <a
+                  href="assets/docs/comercioAlimentacion2024.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-tabla-naranja d-inline-flex align-items-center justify-content-center gap-1"
+                  style="
+                    text-decoration: none;
+                    padding: 2px 10px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  2024(+3,1%)<i class="bi bi-file-pdf"></i>
+                </a>
+              </th>
             </tr>
           </thead>
           <tbody>
             @for (grupo of iaService.tablasSalariales; track grupo.grupo) {
               <tr class="table-light">
-                <td colspan="5" class="fw-bold text-primary" style="background-color: #f8f9fa;">
+                <td colspan="5" class="fw-bold text-primary" style="background-color: #f8f9fa">
                   <i class="bi bi-arrow-right-short"></i> Grupo Profesional {{ grupo.grupo }}
                 </td>
               </tr>
               @for (sub of grupo.subgrupos; track sub.oficio) {
                 <tr [class.table-warning]="grupo.grupo === 'G4'">
-                  <td class="text-center"><span class="badge bg-dark">{{ grupo.grupo }}</span></td>
+                  <td class="text-center">
+                    <span class="badge bg-dark">{{ grupo.grupo }}</span>
+                  </td>
                   <td>
                     <div class="fw-bold">{{ sub.oficio }}</div>
-                    <small class="text-muted" style="font-size: 0.7rem;">{{ sub.desc }}</small>
+                    <small class="text-muted" style="font-size: 0.7rem">{{ sub.desc }}</small>
                   </td>
-                  <td class="text-center fw-bold">{{ sub.s2022 | number:'1.2-2' }}€</td>
-                  <td class="text-center text-muted">{{ (sub.s2022 * 1.035) | number:'1.2-2' }}€</td>
-                  <td class="text-center text-muted">{{ (sub.s2022 * 1.035 * 1.031) | number:'1.2-2' }}€</td>
+                  <td class="text-center fw-bold">{{ sub.s2022 | number: '1.2-2' }}€</td>
+                  <td class="text-center text-muted">{{ sub.s2022 * 1.035 | number: '1.2-2' }}€</td>
+                  <td class="text-center text-muted">
+                    {{ sub.s2022 * 1.035 * 1.031 | number: '1.2-2' }}€
+                  </td>
                 </tr>
               }
             }
@@ -75,80 +98,100 @@
   </div>
 </div>
 
-
-  <div class="container mt-5">
-  <div class="alert alert-danger border-0 shadow-sm mb-4 p-4" style="border-radius: 15px; background-color: #fceaea;">
+<div class="container mt-5">
+  <div
+    class="alert alert-danger border-0 shadow-sm mb-4 p-4"
+    style="border-radius: 15px; background-color: #fceaea"
+  >
     <div class="d-flex align-items-center">
-      <i class="bi bi-building-fill fs-3 me-3" style="color: #c00000;"></i>
+      <i class="bi bi-building-fill fs-3 me-3" style="color: #c00000"></i>
       <div>
-        <h5 class="fw-bold mb-1" style="color: #c00000;">Convenio Colectivo de Empresa DIA (Modelo A)</h5>
-        <p class="mb-0 text-muted" style="font-size: 0.95rem;">
-          Este modelo se aplica específicamente en <strong>Bizkaia</strong> según el V Convenio (BOE 2023). 
-          Las subidas salariales son del <strong>3% anual</strong> aproximadamente.<br>
+        <h5 class="fw-bold mb-1" style="color: #c00000">
+          Convenio Colectivo de Empresa DIA (Modelo A)
+        </h5>
+        <p class="mb-0 text-muted" style="font-size: 0.95rem">
+          Este modelo se aplica específicamente en <strong>Bizkaia</strong> según el V Convenio (BOE
+          2023). Las subidas salariales son del <strong>3% anual</strong> aproximadamente.<br />
           La antigüedad en DIA se computa por <strong>trienios al 3%</strong> (Art. 34).
         </p>
       </div>
     </div>
   </div>
 
-<div class="card shadow-lg border-0 mt-4">
-  <div class="card-header bg-danger text-white p-3">
-    <h4 class="mb-0">Desglose Salarial DIA (Modelo A) - Por Oficios</h4>
-  </div>
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr class="text-center">
-            <th style="width: 100px;">Grupo</th>
-            <th>Oficio Específico</th>
-            <th class="text-center">
-              <!--<a href="http://localhost:4200/assets/docs/ConvenioDia2022.pdf" -->
-              <a href="assets/docs/ConvenioDia2022.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="btn-tabla-roja d-inline-flex align-items-center justify-content-center gap-1" 
-                style="text-decoration: none; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                2022 <i class="bi bi-file-pdf"></i>
-              </a>
-            </th>
-            <th>2023(+3%)</th>
-            <th>2024(+3%)</th>
-            <th class="text-center">
-              <!--<a href="http://localhost:4200/assets/docs/ConvenioDia2022.pdf" -->
-              <a href="assets/docs/ConvenioDia2025.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                class="btn-tabla-roja d-inline-flex align-items-center justify-content-center gap-1" 
-                style="text-decoration: none; padding: 2px 10px; border-radius: 50px; font-size: 0.85rem;">
-                2025(+3%) <i class="bi bi-file-pdf"></i>
-              </a>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (grupo of iaService.tablaDiaModeloA; track grupo.grupo) {
-            <tr class="table-light">
-              <td colspan="7" class="fw-bold text-danger" style="background-color: #fff5f5;">
-                <i class="bi bi-caret-right-fill"></i> Grupo Profesional {{ grupo.grupo }}
-              </td>
+  <div class="card shadow-lg border-0 mt-4">
+    <div class="card-header bg-danger text-white p-3">
+      <h4 class="mb-0">Desglose Salarial DIA (Modelo A) - Por Oficios</h4>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr class="text-center">
+              <th style="width: 100px">Grupo</th>
+              <th>Oficio Específico</th>
+              <th class="text-center">
+                <!--<a href="http://localhost:4200/assets/docs/ConvenioDia2022.pdf" -->
+                <a
+                  href="assets/docs/ConvenioDia2022.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-tabla-roja d-inline-flex align-items-center justify-content-center gap-1"
+                  style="
+                    text-decoration: none;
+                    padding: 2px 10px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  2022 <i class="bi bi-file-pdf"></i>
+                </a>
+              </th>
+              <th>2023(+3%)</th>
+              <th>2024(+3%)</th>
+              <th class="text-center">
+                <!--<a href="http://localhost:4200/assets/docs/ConvenioDia2022.pdf" -->
+                <a
+                  href="assets/docs/ConvenioDia2025.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn-tabla-roja d-inline-flex align-items-center justify-content-center gap-1"
+                  style="
+                    text-decoration: none;
+                    padding: 2px 10px;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                  "
+                >
+                  2025(+3%) <i class="bi bi-file-pdf"></i>
+                </a>
+              </th>
             </tr>
-            @for (sub of grupo.subgrupos; track sub.oficio) {
-              <tr class="text-center">
-                <td><span class="badge bg-danger">{{ grupo.grupo }}</span></td>
-                <td class="text-start">
-                  <div class="fw-bold">{{ sub.oficio }}</div>
+          </thead>
+          <tbody>
+            @for (grupo of iaService.tablaDiaModeloA; track grupo.grupo) {
+              <tr class="table-light">
+                <td colspan="7" class="fw-bold text-danger" style="background-color: #fff5f5">
+                  <i class="bi bi-caret-right-fill"></i> Grupo Profesional {{ grupo.grupo }}
                 </td>
-                <td class="fw-bold text-danger">{{ sub.s2022 | number:'1.2-2' }}€</td>
-                <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2023) | number:'1.2-2' }}€</td>
-                <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2024) | number:'1.2-2' }}€</td>
-                <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2025) | number:'1.2-2' }}€</td>
               </tr>
+              @for (sub of grupo.subgrupos; track sub.oficio) {
+                <tr class="text-center">
+                  <td>
+                    <span class="badge bg-danger">{{ grupo.grupo }}</span>
+                  </td>
+                  <td class="text-start">
+                    <div class="fw-bold">{{ sub.oficio }}</div>
+                  </td>
+                  <td class="fw-bold text-danger">{{ sub.s2022 | number: '1.2-2' }}€</td>
+                  <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2023) | number: '1.2-2' }}€</td>
+                  <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2024) | number: '1.2-2' }}€</td>
+                  <td>{{ iaService.getSalarioDiaAnio(sub.s2022, 2025) | number: '1.2-2' }}€</td>
+                </tr>
+              }
             }
-          }
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 </div>

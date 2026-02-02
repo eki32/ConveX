@@ -46,7 +46,9 @@
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 2px solid #e5e7eb;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .resumen-card:hover {
@@ -60,10 +62,18 @@
   margin-bottom: 8px;
 }
 
-.resumen-numero.festivo { color: #dc2626; }
-.resumen-numero.convenio { color: #f59e0b; }
-.resumen-numero.laborable { color: #059669; }
-.resumen-numero.total { color: #1e40af; }
+.resumen-numero.festivo {
+  color: #dc2626;
+}
+.resumen-numero.convenio {
+  color: #f59e0b;
+}
+.resumen-numero.laborable {
+  color: #059669;
+}
+.resumen-numero.total {
+  color: #1e40af;
+}
 
 .resumen-label {
   font-size: 14px;

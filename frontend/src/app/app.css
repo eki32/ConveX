@@ -1,5 +1,6 @@
 /* Quitamos márgenes por defecto del navegador */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -22,8 +23,9 @@ body, html {
   .main-content {
     padding: 10px;
   }
-  
-  body, html {
+
+  body,
+  html {
     overflow-x: hidden; /* Evita scroll horizontal en toda la página */
   }
 }

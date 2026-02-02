@@ -1,11 +1,11 @@
 {
   "name": "convex-root",
   "version": "1.0.0",
- "scripts": {
-  "ng": "ng",
-  "start": "node backend/server.js",
-  "build": "ng build"
-},
+  "scripts": {
+    "ng": "ng",
+    "start": "node backend/server.js",
+    "build": "ng build"
+  },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@google/generative-ai": "^0.24.1",
@@ -14,24 +14,22 @@
     "dotenv": "^17.2.3",
     "mysql": "^2.18.1",
     "mysql2": "^3.16.1",
-      "@angular/animations": "^18.0.0",
-      "@angular/common": "^18.0.0",
-      "@angular/compiler": "^18.0.0",
-      "@angular/core": "^18.0.0",
-      "@angular/forms": "^18.0.0",
-      "@angular/platform-browser": "^18.0.0",
-      "@angular/platform-browser-dynamic": "^18.0.0",
-      "@angular/router": "^18.0.0",
-      "rxjs": "~7.8.0",
-      "tslib": "^2.3.0",
-      "zone.js": "~0.14.0"
-},
-
-
-"devDependencies": {
-  "@angular-devkit/build-angular": "^18.0.0",
-  "@angular/cli": "^18.0.0",
-  "@angular/compiler-cli": "^18.0.0",
-  "typescript": "~5.4.2"
-}
+    "@angular/animations": "^18.0.0",
+    "@angular/common": "^18.0.0",
+    "@angular/compiler": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@angular/forms": "^18.0.0",
+    "@angular/platform-browser": "^18.0.0",
+    "@angular/platform-browser-dynamic": "^18.0.0",
+    "@angular/router": "^18.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^18.0.0",
+    "@angular/cli": "^18.0.0",
+    "@angular/compiler-cli": "^18.0.0",
+    "typescript": "~5.4.2"
+  }
 }

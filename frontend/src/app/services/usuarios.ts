@@ -3,15 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuariosService {
-  
   private usuarioActual: any = null;
 
   private apiUrl = 'https://convex-production.up.railway.app/'; // Ajusta a tu URL de backend
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   async login(credentials: any): Promise<any> {
     const res: any = await firstValueFrom(this.http.post(`${this.apiUrl}login`, credentials));
@@ -34,4 +33,5 @@ export class UsuariosService {
       if (saved) this.usuarioActual = JSON.parse(saved);
     }
     return this.usuarioActual;
-  }}
+  }
+}

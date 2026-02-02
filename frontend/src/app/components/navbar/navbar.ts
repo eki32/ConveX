@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.css']
+  styleUrls: ['./navbar.css'],
 })
 export class NavbarComponent {
   public authService = inject(AuthService);
@@ -22,16 +22,16 @@ export class NavbarComponent {
   }
 
   closeMenu() {
-  this.isMenuOpen = false;
-}
-  
+    this.isMenuOpen = false;
+  }
+
   logout() {
     // 1. Borrar la clave exacta que usaste en el login/inicio
-    localStorage.removeItem('usuarioLogueado'); 
+    localStorage.removeItem('usuarioLogueado');
     localStorage.removeItem('usuario'); // Por seguridad borramos ambas si tienes dudas
 
     // 2. Limpiar los datos del informe (tablas de 2022-2025)
-    this.iaService.limpiarMemoria(); 
+    this.iaService.limpiarMemoria();
 
     // 3. Resetear el estado del usuario en el Signal
     this.authService.currentUser.set(null);
@@ -39,7 +39,4 @@ export class NavbarComponent {
     // 4. Redirigir al login
     this.router.navigate(['/login']);
   }
-
-  
 }
-

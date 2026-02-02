@@ -46,16 +46,16 @@
       <div class="mes-header">
         <h3>{{ mes.nombre }}</h3>
       </div>
-      
+
       <div class="calendario-mes">
         <div class="dias-semana">
           <div class="dia-semana-header" *ngFor="let dia of diasSemana">
             {{ dia }}
           </div>
         </div>
-        
+
         <div class="dias-grid">
-          <div 
+          <div
             *ngFor="let dia of mes.dias"
             [class]="obtenerClaseDia(dia)"
             [title]="dia.descripcion || ''"
@@ -81,7 +81,10 @@
   </div>
 
   <div class="nota-info">
-    <p><strong>Nota:</strong> Este calendario muestra los festivos oficiales de Bizkaia para el sector de alimentación en 2025.</p>
+    <p>
+      <strong>Nota:</strong> Este calendario muestra los festivos oficiales de Bizkaia para el
+      sector de alimentación en 2025.
+    </p>
     <p>Los días marcados de lunes a sábado son laborables. Los domingos son descanso semanal.</p>
     <p>Puedes hacer clic en días laborables para marcarlos como "Día de Convenio" si aplica.</p>
   </div>

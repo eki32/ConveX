@@ -27,7 +27,9 @@
   border-style: dashed !important;
 }
 
-.text-dark { color: #003366 !important; }
+.text-dark {
+  color: #003366 !important;
+}
 
 .border-dashed {
   border: 2px dashed #ced4da !important;

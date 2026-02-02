@@ -1,74 +1,128 @@
 <div class="container mt-5 pt-4">
   <div class="row g-4">
     <div class="col-md-4">
-      <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 20px;">
+      <div class="card shadow-sm border-0 p-4 mb-4" style="border-radius: 20px">
         <div class="text-center mb-3">
-          <div class="avatar-placeholder mx-auto mb-2" style="background: #003366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <div
+            class="avatar-placeholder mx-auto mb-2"
+            style="
+              background: #003366;
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            "
+          >
             @if (usuarioLogueado?.nombre) {
-              <span class="text-white fw-bold" style="font-size: 1.8rem; text-transform: uppercase;">
+              <span class="text-white fw-bold" style="font-size: 1.8rem; text-transform: uppercase">
                 {{ usuarioLogueado.nombre.charAt(0) }}
               </span>
             } @else {
-            <i class="bi bi-person-fill text-white fs-1"></i>
+              <i class="bi bi-person-fill text-white fs-1"></i>
             }
           </div>
           <h5 class="fw-bold text-dark mb-0">{{ usuarioLogueado?.nombre }}</h5>
           <div class="d-flex justify-content-center mt-2">
-            <div class="input-group input-group-sm" style="width: fit-content;">
-              <label class="input-group-text bg-light text-muted border-end-0" style="border-radius: 10px 0 0 10px; font-size: 0.75rem;">Grupo</label>
+            <div class="input-group input-group-sm" style="width: fit-content">
+              <label
+                class="input-group-text bg-light text-muted border-end-0"
+                style="border-radius: 10px 0 0 10px; font-size: 0.75rem"
+                >Grupo</label
+              >
               @if (usuarioLogueado) {
-                <select class="form-select form-select-sm fw-bold border-start-0 shadow-none" 
-                        [(ngModel)]="usuarioLogueado.grupo" 
-                        (change)="actualizarTodoPorGrupo()"
-                        style="border-radius: 0 10px 10px 0; color: #003366; background-color: #f8f9fa; cursor: pointer;">
+                <select
+                  class="form-select form-select-sm fw-bold border-start-0 shadow-none"
+                  [(ngModel)]="usuarioLogueado.grupo"
+                  (change)="actualizarTodoPorGrupo()"
+                  style="
+                    border-radius: 0 10px 10px 0;
+                    color: #003366;
+                    background-color: #f8f9fa;
+                    cursor: pointer;
+                  "
+                >
                   <option value="G1">G1</option>
                   <option value="G2">G2</option>
                   <option value="G3">G3</option>
                   <option value="G4">G4</option>
                 </select>
               } @else {
-                <span class="badge bg-light text-muted border" style="border-radius: 0 10px 10px 0;">Cargando...</span>
+                <span class="badge bg-light text-muted border" style="border-radius: 0 10px 10px 0"
+                  >Cargando...</span
+                >
               }
             </div>
           </div>
         </div>
-        <hr class="text-muted opacity-25">
+        <hr class="text-muted opacity-25" />
         <div class="user-info-list small">
           <p class="mb-2"><strong>Email:</strong> {{ usuarioLogueado?.email }}</p>
-          <p class="mb-0"><strong>Antigüedad:</strong> {{ usuarioLogueado?.fechaAlta | date:'dd/MM/yyyy' }}</p>
+          <p class="mb-0">
+            <strong>Antigüedad:</strong> {{ usuarioLogueado?.fechaAlta | date: 'dd/MM/yyyy' }}
+          </p>
         </div>
       </div>
 
-      <div class="card shadow-sm border-0 p-4" style="border-radius: 20px; background: #f8f9fa;">
-        <h6 class="fw-bold mb-3" style="color: #003366;"><i class="bi bi-sliders me-2"></i>Ajuste de Impuestos</h6>
+      <div class="card shadow-sm border-0 p-4" style="border-radius: 20px; background: #f8f9fa">
+        <h6 class="fw-bold mb-3" style="color: #003366">
+          <i class="bi bi-sliders me-2"></i>Ajuste de Impuestos
+        </h6>
         <label class="small text-muted mb-2">Introduce tu % de IRPF actual:</label>
         <div class="input-group">
-          <span class="input-group-text bg-white border-end-0"><i class="bi bi-percent text-primary"></i></span>
-          <input type="number" class="form-control border-start-0 fw-bold" [(ngModel)]="irpfManual" (change)="actualizarTodoPorIrpf()" placeholder="Ej: 10">
+          <span class="input-group-text bg-white border-end-0"
+            ><i class="bi bi-percent text-primary"></i
+          ></span>
+          <input
+            type="number"
+            class="form-control border-start-0 fw-bold"
+            [(ngModel)]="irpfManual"
+            (change)="actualizarTodoPorIrpf()"
+            placeholder="Ej: 10"
+          />
         </div>
         <div class="mt-3 p-2 rounded bg-white border">
-          <p class="x-small text-muted mb-0" style="font-size: 0.7rem;">
-            * Cálculo aplicado: <strong>{{ irpfManual }}%</strong> (IRPF) + <strong>6.45%</strong> (Seg. Social).
+          <p class="x-small text-muted mb-0" style="font-size: 0.7rem">
+            * Cálculo aplicado: <strong>{{ irpfManual }}%</strong> (IRPF) +
+            <strong>6.45%</strong> (Seg. Social).
           </p>
         </div>
       </div>
     </div>
 
     <div class="col-md-8">
-      <div class="card shadow-sm border-0 p-4" style="border-radius: 20px;">
-        <h4 class="fw-bold mb-3" style="color: #003366;">Calculadora de Atrasos</h4>
-        <p class="text-muted small mb-4">Sube las fotos de tus nóminas (máx. 15) para el cálculo anual.</p>
-        <div class="upload-zone text-center p-4 border-dashed" 
-              (click)="fileInput.click()" 
-              [style.opacity]="listaNominas.length >= 4 ? '0.5' : '1'"
-              [style.pointer-events]="listaNominas.length >= 4 || analizando ? 'none' : 'auto'"
-              style="cursor: pointer; border: 2px dashed #ccc; border-radius: 15px;">
-            <input type="file" #fileInput (change)="onFilesSelected($event)" accept="image/*" hidden multiple>
-            <i class="bi bi-cloud-arrow-up-fill display-4" style="color: #f37021;"></i>
-            <p class="mt-3 fw-bold mb-1">
-              {{ listaNominas.length >= 4 ? 'Límite de ráfaga alcanzado' : 'Subir nóminas (Máx. 4 por vez)' }}
-            </p>
-            <span class="badge rounded-pill bg-light text-dark border">{{ listaNominas.length }} / 4 pendientes</span>
+      <div class="card shadow-sm border-0 p-4" style="border-radius: 20px">
+        <h4 class="fw-bold mb-3" style="color: #003366">Calculadora de Atrasos</h4>
+        <p class="text-muted small mb-4">
+          Sube las fotos de tus nóminas (máx. 15) para el cálculo anual.
+        </p>
+        <div
+          class="upload-zone text-center p-4 border-dashed"
+          (click)="fileInput.click()"
+          [style.opacity]="listaNominas.length >= 4 ? '0.5' : '1'"
+          [style.pointer-events]="listaNominas.length >= 4 || analizando ? 'none' : 'auto'"
+          style="cursor: pointer; border: 2px dashed #ccc; border-radius: 15px"
+        >
+          <input
+            type="file"
+            #fileInput
+            (change)="onFilesSelected($event)"
+            accept="image/*"
+            hidden
+            multiple
+          />
+          <i class="bi bi-cloud-arrow-up-fill display-4" style="color: #f37021"></i>
+          <p class="mt-3 fw-bold mb-1">
+            {{
+              listaNominas.length >= 4
+                ? 'Límite de ráfaga alcanzado'
+                : 'Subir nóminas (Máx. 4 por vez)'
+            }}
+          </p>
+          <span class="badge rounded-pill bg-light text-dark border"
+            >{{ listaNominas.length }} / 4 pendientes</span
+          >
         </div>
 
         @if (listaNominas.length > 0) {
@@ -77,13 +131,30 @@
               <div class="col-4 col-sm-3 col-md-2">
                 <div class="position-relative">
                   @if (item.cargando) {
-                    <div class="d-flex align-items-center justify-content-center rounded border shadow-sm" style="height: 60px; background: #f0f0f0;">
+                    <div
+                      class="d-flex align-items-center justify-content-center rounded border shadow-sm"
+                      style="height: 60px; background: #f0f0f0"
+                    >
                       <div class="spinner-border spinner-border-sm text-secondary"></div>
                     </div>
                   } @else {
-                    <img [src]="item.preview" class="img-fluid rounded shadow-sm border" style="height: 60px; width: 100%; object-fit: cover;">
+                    <img
+                      [src]="item.preview"
+                      class="img-fluid rounded shadow-sm border"
+                      style="height: 60px; width: 100%; object-fit: cover"
+                    />
                   }
-                  <button (click)="eliminarNomina($index)" [disabled]="analizando" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; border-radius: 50%; transform: translate(30%, -30%);">
+                  <button
+                    (click)="eliminarNomina($index)"
+                    [disabled]="analizando"
+                    class="btn btn-danger btn-sm position-absolute top-0 end-0 p-0 d-flex align-items-center justify-content-center"
+                    style="
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      transform: translate(30%, -30%);
+                    "
+                  >
                     <i class="bi bi-x"></i>
                   </button>
                 </div>
@@ -91,9 +162,18 @@
             }
           </div>
           <div class="mt-4 pt-3 border-top">
-            <button (click)="analizarNominas()" [disabled]="analizando" class="btn w-100 fw-bold p-3 shadow-sm" style="background-color: #f37021; color: white; border-radius: 12px;">
-              @if (analizando) { <span class="spinner-border spinner-border-sm me-2"></span> Analizando {{ indiceAnalizando }} de {{ listaNominas.length }}... }
-              @else { <i class="bi bi-cpu-fill me-2"></i> Analizar {{ listaNominas.length }} nóminas }
+            <button
+              (click)="analizarNominas()"
+              [disabled]="analizando"
+              class="btn w-100 fw-bold p-3 shadow-sm"
+              style="background-color: #f37021; color: white; border-radius: 12px"
+            >
+              @if (analizando) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Analizando
+                {{ indiceAnalizando }} de {{ listaNominas.length }}...
+              } @else {
+                <i class="bi bi-cpu-fill me-2"></i> Analizar {{ listaNominas.length }} nóminas
+              }
             </button>
           </div>
         }
@@ -104,89 +184,171 @@
   @if (mostrarResultados && resultados.length > 0) {
     <div class="row mt-5 mb-5 animate__animated animate__fadeInUp">
       <div class="col-12">
-        <div class="card shadow-lg border-0" style="border-radius: 25px; background: #ffffff; overflow: hidden;">
-          <div class="p-4 text-white d-flex justify-content-between align-items-center" style="background: #003366;">
+        <div
+          class="card shadow-lg border-0"
+          style="border-radius: 25px; background: #ffffff; overflow: hidden"
+        >
+          <div
+            class="p-4 text-white d-flex justify-content-between align-items-center"
+            style="background: #003366"
+          >
             <div>
               <h3 class="fw-bold mb-0">Informe de Diferencias Salariales</h3>
               <p class="mb-0 opacity-75 small">Convenio Comercio Alimentación de Bizkaia</p>
             </div>
-            <button (click)="limpiarTodo()" class="btn btn-sm btn-outline-light rounded-pill px-3">Nueva consulta</button>
+            <button (click)="limpiarTodo()" class="btn btn-sm btn-outline-light rounded-pill px-3">
+              Nueva consulta
+            </button>
           </div>
-          
+
           <div class="card-body p-4 p-md-5">
             <div class="row mb-5">
               <div class="col-md-6">
-                <h5 class="fw-bold border-bottom pb-2 mb-3" style="color: #003366;">1. Perfil del Trabajador</h5>
+                <h5 class="fw-bold border-bottom pb-2 mb-3" style="color: #003366">
+                  1. Perfil del Trabajador
+                </h5>
                 <p class="mb-1 small"><strong>Nombre:</strong> {{ usuarioLogueado?.nombre }}</p>
-                <p class="mb-1 small"><strong>Grupo:</strong> {{ usuarioLogueado?.grupo }} (DIA Retail)</p>
+                <p class="mb-1 small">
+                  <strong>Grupo:</strong> {{ usuarioLogueado?.grupo }} (DIA Retail)
+                </p>
               </div>
               <div class="col-md-6 text-md-end">
-                <h5 class="fw-bold border-bottom pb-2 mb-3" style="color: #f37021;">2. Resumen de Análisis</h5>
+                <h5 class="fw-bold border-bottom pb-2 mb-3" style="color: #f37021">
+                  2. Resumen de Análisis
+                </h5>
                 <p class="mb-1 small"><strong>Periodo:</strong> Atrasos {{ anhosFormateados }}</p>
-                <p class="mb-1 small"><strong>Retención Aplicada:</strong> {{ irpfManual + 6.45 | number:'1.2-2' }}%</p>
+                <p class="mb-1 small">
+                  <strong>Retención Aplicada:</strong> {{ irpfManual + 6.45 | number: '1.2-2' }}%
+                </p>
               </div>
             </div>
 
-            <h5 class="fw-bold mb-4" style="color: #003366;"><i class="bi bi-table me-2"></i>3. Tabla Comparativa (Editable)</h5>
+            <h5 class="fw-bold mb-4" style="color: #003366">
+              <i class="bi bi-table me-2"></i>3. Tabla Comparativa (Editable)
+            </h5>
             <div class="table-responsive rounded-4 border-0 shadow-sm mb-5">
-              <table class="table table-hover align-middle mb-0" style="min-width: 900px;">
-                <thead style="background-color: #f8f9fa; border-bottom: 2px solid #eee;">
-                  <tr class="text-secondary text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;">
+              <table class="table table-hover align-middle mb-0" style="min-width: 900px">
+                <thead style="background-color: #f8f9fa; border-bottom: 2px solid #eee">
+                  <tr
+                    class="text-secondary text-center"
+                    style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px"
+                  >
                     <th class="ps-4 py-3 text-start">Año / Concepto</th>
-                    <th class="py-3">Salario Base<br>(DIA)</th>
-                    <th class="py-3">Antigüedad<br>(Diferencia)</th>
-                    <th class="py-3">Convenio Bizkaia<br>(Bruto)</th>
+                    <th class="py-3">Salario Base<br />(DIA)</th>
+                    <th class="py-3">Antigüedad<br />(Diferencia)</th>
+                    <th class="py-3">Convenio Bizkaia<br />(Bruto)</th>
                     <th class="pe-4 py-3 text-end">Diferencia Bruta</th>
                   </tr>
                 </thead>
                 <tbody class="border-0">
                   @for (res of resultados; track $index) {
-                    <tr [style.background-color]="res.esExtra ? '#fffaf5' : 'transparent'" style="transition: all 0.2s ease;">
+                    <tr
+                      [style.background-color]="res.esExtra ? '#fffaf5' : 'transparent'"
+                      style="transition: all 0.2s ease"
+                    >
                       <td class="ps-4 py-3">
                         <div class="d-flex flex-column">
-                          <select class="form-select form-select-sm border-0 bg-light fw-bold mb-1" [(ngModel)]="res.anio" (change)="recalcularFila($index)" style="width: fit-content; font-size: 0.75rem;">
+                          <select
+                            class="form-select form-select-sm border-0 bg-light fw-bold mb-1"
+                            [(ngModel)]="res.anio"
+                            (change)="recalcularFila($index)"
+                            style="width: fit-content; font-size: 0.75rem"
+                          >
                             <option [ngValue]="2022">2022</option>
                             <option [ngValue]="2023">2023</option>
                             <option [ngValue]="2024">2024</option>
                             <option [ngValue]="2025">2025</option>
                           </select>
-                          <input type="text" class="form-control form-control-sm border-0 fw-bold p-0 bg-transparent" [(ngModel)]="res.nombreTipo" (blur)="recalcularFila($index)" [style.color]="res.esExtra ? '#f37021' : '#003366'" style="box-shadow: none; font-size: 0.85rem;">
+                          <input
+                            type="text"
+                            class="form-control form-control-sm border-0 fw-bold p-0 bg-transparent"
+                            [(ngModel)]="res.nombreTipo"
+                            (blur)="recalcularFila($index)"
+                            [style.color]="res.esExtra ? '#f37021' : '#003366'"
+                            style="box-shadow: none; font-size: 0.85rem"
+                          />
                         </div>
                       </td>
                       <td class="text-center">
                         <div class="d-inline-flex flex-column align-items-center">
-                          <div class="input-group input-group-sm shadow-sm" style="width: 105px;">
-                            <input type="number" class="form-control text-center fw-bold border-0" [class.text-danger]="res.salarioBase < 1000 && !res.esOctubre50" [(ngModel)]="res.salarioBase" (change)="recalcularFila($index)" style="background: #f8f9fa; border-radius: 8px;">
+                          <div class="input-group input-group-sm shadow-sm" style="width: 105px">
+                            <input
+                              type="number"
+                              class="form-control text-center fw-bold border-0"
+                              [class.text-danger]="res.salarioBase < 1000 && !res.esOctubre50"
+                              [(ngModel)]="res.salarioBase"
+                              (change)="recalcularFila($index)"
+                              style="background: #f8f9fa; border-radius: 8px"
+                            />
                             <span class="input-group-text bg-transparent border-0 ps-0">€</span>
                           </div>
                           @if (res.salarioBase < 1000 && !res.esOctubre50) {
-                            <small class="text-warning fw-bold mt-1" style="font-size: 0.6rem;"><i class="bi bi-exclamation-triangle-fill"></i> ¿Falta el 1?</small>
+                            <small class="text-warning fw-bold mt-1" style="font-size: 0.6rem"
+                              ><i class="bi bi-exclamation-triangle-fill"></i> ¿Falta el 1?</small
+                            >
                           }
                         </div>
                       </td>
                       <td class="text-center">
                         <div class="d-flex flex-column align-items-center">
-                          <div class="input-group input-group-sm mb-1 shadow-sm" style="width: 110px;">
-                            <span class="input-group-text bg-white border-0 text-muted" style="font-size: 0.6rem;">PAG:</span>
-                            <input type="number" class="form-control border-0 text-center fw-bold" [(ngModel)]="res.antiguedadPagada" (change)="recalcularFila($index)" style="background: #fdf2f2; color: #dc3545; border-radius: 0 8px 8px 0;">
+                          <div
+                            class="input-group input-group-sm mb-1 shadow-sm"
+                            style="width: 110px"
+                          >
+                            <span
+                              class="input-group-text bg-white border-0 text-muted"
+                              style="font-size: 0.6rem"
+                              >PAG:</span
+                            >
+                            <input
+                              type="number"
+                              class="form-control border-0 text-center fw-bold"
+                              [(ngModel)]="res.antiguedadPagada"
+                              (change)="recalcularFila($index)"
+                              style="
+                                background: #fdf2f2;
+                                color: #dc3545;
+                                border-radius: 0 8px 8px 0;
+                              "
+                            />
                           </div>
                           <div class="d-flex gap-2 align-items-center">
-                            <span class="small text-success fw-bold" style="font-size: 0.75rem;">{{ res.antiguedadCalculada | number:'1.2-2' }}€</span>
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.65rem;">
-                              Δ {{ (res.antiguedadCalculada - res.antiguedadPagada) | number:'1.2-2' }} €
+                            <span class="small text-success fw-bold" style="font-size: 0.75rem"
+                              >{{ res.antiguedadCalculada | number: '1.2-2' }}€</span
+                            >
+                            <span
+                              class="badge bg-warning-subtle text-warning border border-warning-subtle"
+                              style="font-size: 0.65rem"
+                            >
+                              Δ
+                              {{ res.antiguedadCalculada - res.antiguedadPagada | number: '1.2-2' }}
+                              €
                             </span>
                           </div>
                         </div>
                       </td>
                       <td class="text-center">
                         <div class="d-flex flex-column align-items-center">
-                          <span class="fw-bold text-primary" style="font-size: 1.1rem;">{{ res.salarioEsperado | number:'1.2-2' }}€</span>
+                          <span class="fw-bold text-primary" style="font-size: 1.1rem"
+                            >{{ res.salarioEsperado | number: '1.2-2' }}€</span
+                          >
                         </div>
                       </td>
                       <td class="text-end pe-4">
-                        <div class="d-inline-flex flex-column align-items-center" style="min-width: 110px;">
-                          <span class="badge rounded-3 px-3 py-2 shadow-sm w-100" [style.background]="res.esExtra ? 'linear-gradient(45deg, #f37021, #ff8c42)' : 'linear-gradient(45deg, #003366, #00509e)'" style="color: white; font-size: 0.95rem;">
-                            +{{ res.diferenciaBruta | number:'1.2-2' }}€
+                        <div
+                          class="d-inline-flex flex-column align-items-center"
+                          style="min-width: 110px"
+                        >
+                          <span
+                            class="badge rounded-3 px-3 py-2 shadow-sm w-100"
+                            [style.background]="
+                              res.esExtra
+                                ? 'linear-gradient(45deg, #f37021, #ff8c42)'
+                                : 'linear-gradient(45deg, #003366, #00509e)'
+                            "
+                            style="color: white; font-size: 0.95rem"
+                          >
+                            +{{ res.diferenciaBruta | number: '1.2-2' }}€
                           </span>
                         </div>
                       </td>
@@ -197,27 +359,40 @@
             </div>
 
             <div class="d-flex justify-content-center mb-4">
-              <button class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-sm" (click)="subirParaMas()">
+              <button
+                class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-sm"
+                (click)="subirParaMas()"
+              >
                 <i class="bi bi-plus-circle-fill me-2"></i> Añadir más nóminas al informe
               </button>
             </div>
 
             <div class="row justify-content-end">
               <div class="col-md-6">
-                <div class="p-4 rounded-4 text-white shadow" style="background: linear-gradient(135deg, #003366 0%, #00509e 100%); border-left: 8px solid #f37021;">
+                <div
+                  class="p-4 rounded-4 text-white shadow"
+                  style="
+                    background: linear-gradient(135deg, #003366 0%, #00509e 100%);
+                    border-left: 8px solid #f37021;
+                  "
+                >
                   <div class="row align-items-center text-center">
                     <div class="col-6 border-end border-white border-opacity-25">
                       <h6 class="text-uppercase x-small opacity-75 mb-1 fw-bold">Total Bruto</h6>
-                      <h4 class="fw-bold mb-0">{{ totalAtrasos | number:'1.2-2' }}€</h4>
+                      <h4 class="fw-bold mb-0">{{ totalAtrasos | number: '1.2-2' }}€</h4>
                     </div>
                     <div class="col-6 ps-3">
-                      <h6 class="text-uppercase x-small fw-bold" style="color: #f37021;">Neto a Percibir</h6>
-                      <h2 class="fw-bold mb-0">{{ totalNetoEstimado | number:'1.2-2' }}€</h2>
+                      <h6 class="text-uppercase x-small fw-bold" style="color: #f37021">
+                        Neto a Percibir
+                      </h6>
+                      <h2 class="fw-bold mb-0">{{ totalNetoEstimado | number: '1.2-2' }}€</h2>
                     </div>
                   </div>
                   <div class="mt-3 pt-2 border-top border-white border-opacity-10 text-center">
-                    <p class="mb-0 opacity-75" style="font-size: 0.75rem;">
-                      * El neto incluye el descuento de <strong>{{ irpfManual }}% IRPF</strong> introducido y el <strong>6.45% de Seguridad Social</strong> estándar.
+                    <p class="mb-0 opacity-75" style="font-size: 0.75rem">
+                      * El neto incluye el descuento de
+                      <strong>{{ irpfManual }}% IRPF</strong> introducido y el
+                      <strong>6.45% de Seguridad Social</strong> estándar.
                     </p>
                   </div>
                 </div>
@@ -226,14 +401,26 @@
 
             <div class="row mt-3">
               <div class="col-12">
-                <div class="alert border-0 shadow-sm d-flex align-items-center" style="background-color: #fffde7; color: #856404; border-radius: 12px; padding: 1rem 1.5rem;">
+                <div
+                  class="alert border-0 shadow-sm d-flex align-items-center"
+                  style="
+                    background-color: #fffde7;
+                    color: #856404;
+                    border-radius: 12px;
+                    padding: 1rem 1.5rem;
+                  "
+                >
                   <i class="bi bi-exclamation-triangle-fill me-3 fs-4"></i>
-                  <span style="font-size: 0.9rem; font-weight: 500;">
-                    Estos cálculos son <strong>meramente orientativos</strong>. Consulte con su sección sindical para un análisis detallado.
+                  <span style="font-size: 0.9rem; font-weight: 500">
+                    Estos cálculos son <strong>meramente orientativos</strong>. Consulte con su
+                    sección sindical para un análisis detallado.
                   </span>
                 </div>
               </div>
             </div>
-
-          </div> </div> </div> </div> }
-</div> 
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -88,7 +88,6 @@ table {
 /* ========================================= */
 
 @media (max-width: 768px) {
-  
   /* ===== CONTAINER AJUSTADO ===== */
   .container {
     padding-left: 0 !important;
@@ -99,7 +98,7 @@ table {
   }
 
   /* ===== ALERTS COMPLETAMENTE AJUSTADOS ===== */
-  
+
   .alert {
     margin-left: 10px !important;
     margin-right: 10px !important;
@@ -171,7 +170,7 @@ table {
   }
 
   /* ===== TABLA: PRIMERA COLUMNA FIJA ===== */
-  
+
   .table-responsive {
     position: relative;
     overflow-x: auto;
@@ -197,7 +196,7 @@ table {
   }
 
   /* Mantener fondos correctos para la primera columna */
-  
+
   .table tbody tr.table-light td:first-child {
     background-color: #f8f9fa !important;
   }
@@ -219,8 +218,8 @@ table {
   }
 
   /* ===== AJUSTES DE TAMAÑO ===== */
-  
-  .btn-tabla-naranja, 
+
+  .btn-tabla-naranja,
   .btn-tabla-roja {
     padding: 4px 8px !important;
     font-size: 0.7rem !important;
@@ -232,8 +231,8 @@ table {
   .btn-tabla-roja i {
     font-size: 10px !important;
   }
-  
-  .table td, 
+
+  .table td,
   .table th {
     padding: 10px 6px !important;
     font-size: 0.8rem !important;
@@ -254,7 +253,7 @@ table {
   }
 
   /* ===== SCROLLBAR MÁS VISIBLE ===== */
-  
+
   .table-responsive::-webkit-scrollbar {
     height: 12px !important;
   }

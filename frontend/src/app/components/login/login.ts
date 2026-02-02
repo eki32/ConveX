@@ -9,7 +9,7 @@ import { isPlatformBrowser, CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, RouterLink, CommonModule],
   templateUrl: './login.html',
-  styleUrls: ['./login.css']
+  styleUrls: ['./login.css'],
 })
 export class LoginComponent {
   authService = inject(AuthService);
@@ -23,7 +23,6 @@ export class LoginComponent {
   errorCodigo = false;
   private CODIGO_SECRETO = '1111';
 
-
   cerrarModal(event?: MouseEvent) {
     if (!event || event.target === event.currentTarget) {
       this.mostrarModalCodigo = false;
@@ -32,34 +31,35 @@ export class LoginComponent {
     }
   }
 
- async validarCodigo() {
-  try {
+  async validarCodigo() {
+    try {
+      console.log('Validando código...'); // ← debug
+      console.log('🔑 Código introducido:', this.codigoIntroducido);
+      console.log('🚀 Llamando a validarCodigoRegistro...');
+      const res = await this.authService.validarCodigoRegistro(this.codigoIntroducido);
 
-    console.log('Validando código...'); // ← debug
-    console.log('🔑 Código introducido:', this.codigoIntroducido);
-    console.log('🚀 Llamando a validarCodigoRegistro...');
-    const res = await this.authService.validarCodigoRegistro(this.codigoIntroducido);
-    
-    console.log('📥 Respuesta recibida:', res);
-    
-    if (res.valido) {
-      this.mostrarModalCodigo = false;
-      this.errorCodigo = false;
-      this.codigoIntroducido = '';
-      this.router.navigate(['/registro']);
-    } else {
+      console.log('📥 Respuesta recibida:', res);
+
+      if (res.valido) {
+        this.mostrarModalCodigo = false;
+        this.errorCodigo = false;
+        this.codigoIntroducido = '';
+        this.router.navigate(['/registro']);
+      } else {
+        this.errorCodigo = true;
+      }
+    } catch (err: any) {
+      console.error('Error completo:', err); // ← ver el error completo
       this.errorCodigo = true;
-    }
-  } catch (err: any) {
-    console.error('Error completo:', err); // ← ver el error completo
-    this.errorCodigo = true;
-    
-    // Mostrar mensaje más específico
-    if (err.status === 404) {
-      alert('Error: El servidor no encontró el endpoint. Verifica que el backend esté corriendo.');
+
+      // Mostrar mensaje más específico
+      if (err.status === 404) {
+        alert(
+          'Error: El servidor no encontró el endpoint. Verifica que el backend esté corriendo.',
+        );
+      }
     }
   }
-}
 
   async onSubmit() {
     if (isPlatformBrowser(this.platformId)) {
