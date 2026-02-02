@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IaService } from '../../services/ia';
 import { CalendarioComponent } from '../calendario/calendario';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 @Component({
   selector: 'app-excesos',
@@ -79,6 +81,67 @@ export class ExcesosComponent implements OnInit {
     this.calcularDiasTotalesAnio();
     this.cargarDatosUsuario();
   }
+
+
+  exportarInformePDF() {
+  // 1. Declaramos como 'any' para evitar conflictos con los tipos de la librería
+  const doc = new jsPDF() as any; 
+  const fechaHoy = new Date().toLocaleDateString();
+
+  // Encabezado Formal
+  doc.setFontSize(18);
+  doc.setTextColor(0, 51, 102);
+  doc.text('Informe de Cálculo: Excesos de Jornada', 14, 20);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text(`Generado el: ${fechaHoy} | Trabajador: ${this.usuarioLogueado.nombre}`, 14, 28);
+  doc.text(`Referencia: VI Convenio Colectivo DIA - Año 2025`, 14, 33);
+
+  // 2. Tabla de Datos de Entrada
+  doc.autoTable({
+    startY: 40,
+    head: [['Concepto', 'Valor']],
+    body: [
+      ['Jornada Semanal Contrato', `${this.usuarioLogueado.jornadaContrato}h`],
+      ['Jornada Máxima Anual (Convenio 2025)', '1.780 horas'], // Referencia normativa
+      ['Días Laborables Netos', `${this.diasLaborables} días`],
+      ['Días de Vacaciones', `${this.diasVacaciones} días`],
+      ['Días de Baja Médica', `${this.diasBaja || 0} días`],
+    ],
+    theme: 'striped',
+    headStyles: { fillColor: [0, 51, 102] }
+  });
+
+  // 3. Resultados Finales
+  // Usamos doc.lastAutoTable.finalY porque doc ya está tipado como any
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(14);
+  doc.setTextColor(0, 0, 0);
+  doc.text('RESULTADO DEL CÓMPUTO ANUAL', 14, finalY);
+
+  // IMPORTANTE: Aquí llamamos a doc.autoTable en lugar de autoTable(doc...)
+  doc.autoTable({
+    startY: finalY + 5,
+    body: [
+      ['Total Horas Efectivas Realizadas', `${this.totalHorasRealizadas}h`],
+      ['EXCESO DETECTADO', `${this.excesoHoras.toFixed(2)}h`],
+      ['Compensación en Días de Descanso', `${this.diasCompensacion} días`],
+      ['Importe Monetario Bruto (+50% Recargo)', `${this.importeMonetario} €`]
+    ],
+    styles: { fontSize: 12, cellPadding: 5 },
+    columnStyles: { 1: { fontStyle: 'bold', halign: 'right' } }
+  });
+
+  // Pie de página con base legal
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  const pageHeight = doc.internal.pageSize.height;
+  doc.text('Cálculo basado en jornada de trabajo efectivo (Art. 24 VI Convenio DIA). Recargo de horas según Art. 31.', 14, pageHeight - 10);
+
+  doc.save(`Informe_Excesos_2025_${this.usuarioLogueado.nombre}.pdf`);
+}
+
 
   // ==================== CALCULAR DÍAS TOTALES DEL AÑO ====================
   calcularDiasTotalesAnio() {
