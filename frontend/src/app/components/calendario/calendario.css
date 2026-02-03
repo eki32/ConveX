@@ -442,9 +442,6 @@
   margin: 0;
 }
 
-.input-horas[type=number] {
-  -moz-appearance: textfield;
-}
 
 .horas-fijas {
   font-size: 0.8rem;
