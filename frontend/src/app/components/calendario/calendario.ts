@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, Output, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FESTIVOS_BIZKAIA } from './festivos-config';
@@ -11,6 +11,10 @@ interface DiaCalendario {
   esDiaConvenio: boolean;
   esFinDeSemana: boolean;
   esLaborable: boolean;
+  esVacaciones?: boolean;
+  esBaja?: boolean; // ✅ NUEVO: Para marcar días de baja
+  horasTrabajadas: number;
+  horasOriginales?: number; // ✅ NUEVO: Guardar las horas que tenía antes de vacaciones/baja
   tipoFestivo?: string;
   descripcion?: string;
 }
@@ -28,75 +32,76 @@ interface MesCalendario {
   templateUrl: './calendario.html',
   styleUrls: ['./calendario.css'],
 })
-export class CalendarioComponent implements OnInit {
+export class CalendarioComponent implements OnInit, OnChanges {
   private cdr = inject(ChangeDetectorRef);
 
-  // Calcular automáticamente el año anterior
-  anio = new Date().getFullYear() - 1; // Siempre muestra el año pasado
+  anio = new Date().getFullYear() - 1;
   meses: MesCalendario[] = [];
-
-  // Festivos se cargarán dinámicamente según el año
   festivosOficiales: any[] = [];
-
-  // Días adicionales de convenio
   diasConvenio: any[] = [];
 
+  // Totales
   totalFestivos = 0;
   totalLaborables = 0;
   totalDiasConvenio = 0;
+  totalHorasTrabajadas = 0;
+  horasDescontadasVacaciones = 0; // ✅ NUEVO: Horas descontadas por vacaciones
+  horasDescontadasBajas = 0; // ✅ NUEVO: Horas descontadas por bajas
+  
+  // Variables para detectar triple clic
+  private clickCount = 0;
+  private clickTimer: any = null;
+  private lastClickedDia: DiaCalendario | null = null;
 
   diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   nombresMeses = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre',
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
   ];
 
   @Output() datosCalendario = new EventEmitter<{
-    laborables: number;
+    totalHorasTrabajadas: number;
+    horasDescontadasVacaciones: number;
+    horasDescontadasBajas: number;
     festivosOficiales: number;
     festivosConvenio: number;
-    totalDiasLS?: number;
+    diasLaborables: number;
     fechasFestivos?: Date[];
   }>();
+
+  @Input() periodoInvierno: any;
+  @Input() periodoVerano: any;
+  @Input() diasBaja: number = 0; // ✅ NUEVO: Recibir días de baja desde el padre
 
   ngOnInit() {
     this.cargarFestivosDelAnio();
     this.generarCalendario();
   }
 
-  /**
-   * Carga los festivos oficiales según el año
-   */
+  // ✅ NUEVO: Detectar cambios en los inputs
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['periodoInvierno'] || changes['periodoVerano'] || changes['diasBaja']) {
+      if (this.meses.length > 0) {
+        this.aplicarVacacionesYBajas();
+        this.calcularTotales();
+      }
+    }
+  }
+
   cargarFestivosDelAnio() {
-    // Cargar festivos desde el archivo de configuración
     if (FESTIVOS_BIZKAIA[this.anio]) {
       this.festivosOficiales = FESTIVOS_BIZKAIA[this.anio];
     } else {
-      // Si no tenemos datos del año, generar festivos fijos
       console.warn(`⚠️ Festivos de ${this.anio} no disponibles. Usando festivos genéricos.`);
       this.festivosOficiales = this.generarFestivosFijos(this.anio);
     }
 
-    // Días de convenio (siempre 24 y 31 de diciembre)
     this.diasConvenio = [
       { fecha: `${this.anio}-12-24`, descripcion: 'Nochebuena (Convenio)' },
       { fecha: `${this.anio}-12-31`, descripcion: 'Fin de Año (Convenio)' },
     ];
   }
 
-  /**
-   * Genera festivos fijos para cualquier año (sin Semana Santa que es variable)
-   */
   generarFestivosFijos(anio: number): any[] {
     return [
       { fecha: `${anio}-01-01`, descripcion: 'Año Nuevo', tipo: 'Nacional' },
@@ -125,7 +130,25 @@ export class CalendarioComponent implements OnInit {
       });
     }
 
+    this.aplicarVacacionesYBajas();
     this.calcularTotales();
+  }
+
+  esFechaEnVacaciones(fecha: Date): boolean {
+    if (!fecha || fecha.getTime() === 0) return false;
+    
+    const check = (p: any) => {
+      if (!p?.inicio || !p?.fin) return false;
+      const inicio = new Date(p.inicio);
+      const fin = new Date(p.fin);
+      inicio.setHours(0,0,0,0);
+      fin.setHours(0,0,0,0);
+      const actual = new Date(fecha);
+      actual.setHours(0,0,0,0);
+      return actual >= inicio && actual <= fin;
+    };
+
+    return check(this.periodoInvierno) || check(this.periodoVerano);
   }
 
   generarDiasMes(mes: number): DiaCalendario[] {
@@ -133,11 +156,9 @@ export class CalendarioComponent implements OnInit {
     const primerDia = new Date(this.anio, mes, 1);
     const ultimoDia = new Date(this.anio, mes + 1, 0);
 
-    // Calcular días vacíos al inicio (lunes = 0)
     let diaSemana = primerDia.getDay();
-    diaSemana = diaSemana === 0 ? 6 : diaSemana - 1; // Ajustar domingo
+    diaSemana = diaSemana === 0 ? 6 : diaSemana - 1;
 
-    // Añadir días vacíos
     for (let i = 0; i < diaSemana; i++) {
       dias.push({
         fecha: new Date(0),
@@ -147,19 +168,23 @@ export class CalendarioComponent implements OnInit {
         esDiaConvenio: false,
         esFinDeSemana: false,
         esLaborable: false,
+        horasTrabajadas: 0,
       });
     }
 
-    // Añadir días del mes
     for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
       const fecha = new Date(this.anio, mes, dia);
       const fechaStr = this.formatearFecha(fecha);
 
       const festivo = this.festivosOficiales.find((f) => f.fecha === fechaStr);
       const diaConvenio = this.diasConvenio.find((d) => d.fecha === fechaStr);
+      
+      const enVacaciones = this.esFechaEnVacaciones(fecha);
 
       const diaSem = fecha.getDay();
-      const esFinDeSemana = diaSem === 0; // Solo domingo
+      const esFinDeSemana = diaSem === 0;
+
+      const esLaborable = !festivo && !diaConvenio && !esFinDeSemana && !enVacaciones;
 
       dias.push({
         fecha: fecha,
@@ -168,13 +193,79 @@ export class CalendarioComponent implements OnInit {
         esFestivo: !!festivo,
         esDiaConvenio: !!diaConvenio,
         esFinDeSemana: esFinDeSemana,
-        esLaborable: !festivo && !diaConvenio && !esFinDeSemana,
+        esLaborable: esLaborable,
+        esVacaciones: enVacaciones,
+        esBaja: false,
+        horasTrabajadas: 0,
+        horasOriginales: 0,
         tipoFestivo: festivo?.tipo,
-        descripcion: festivo?.descripcion || diaConvenio?.descripcion,
+        descripcion: enVacaciones ? 'Vacaciones' : (festivo?.descripcion || diaConvenio?.descripcion),
       });
     }
 
     return dias;
+  }
+
+  // ✅ NUEVO: Aplicar vacaciones y bajas
+  aplicarVacacionesYBajas() {
+    // Primero restaurar todas las horas originales (excepto bajas manuales)
+    this.meses.forEach((mes) => {
+      mes.dias.forEach((dia) => {
+        if (dia.dia > 0 && dia.horasOriginales !== undefined) {
+          // Solo restaurar si NO es una baja manual (las bajas manuales tienen descripción específica)
+          const esBajaManual = dia.esBaja && dia.descripcion === 'Baja Médica (Manual)';
+          if (!esBajaManual) {
+            dia.horasTrabajadas = dia.horasOriginales;
+            dia.esVacaciones = this.esFechaEnVacaciones(dia.fecha);
+            dia.esBaja = false;
+          }
+        }
+      });
+    });
+
+    // Aplicar vacaciones
+    this.meses.forEach((mes) => {
+      mes.dias.forEach((dia) => {
+        if (dia.dia > 0 && dia.esVacaciones) {
+          // Guardar horas originales si no se han guardado ya
+          if (dia.horasOriginales === undefined || dia.horasOriginales === 0) {
+            dia.horasOriginales = dia.horasTrabajadas;
+          }
+          // Poner a 0 las horas trabajadas en vacaciones
+          dia.horasTrabajadas = 0;
+          dia.descripcion = 'Vacaciones';
+        }
+      });
+    });
+
+    // Aplicar bajas automáticas desde el input (desde el inicio del año)
+    // SOLO si diasBaja > 0 Y no hay bajas manuales ya marcadas
+    if (this.diasBaja > 0) {
+      let diasBajaRestantes = this.diasBaja;
+      
+      for (let mesIdx = 0; mesIdx < this.meses.length && diasBajaRestantes > 0; mesIdx++) {
+        const mes = this.meses[mesIdx];
+        
+        for (let diaIdx = 0; diaIdx < mes.dias.length && diasBajaRestantes > 0; diaIdx++) {
+          const dia = mes.dias[diaIdx];
+          
+          // Solo aplicar baja automática a días laborables que no estén de vacaciones 
+          // y que NO sean bajas manuales
+          const esBajaManual = dia.esBaja && dia.descripcion === 'Baja Médica (Manual)';
+          if (dia.dia > 0 && dia.esLaborable && !dia.esVacaciones && !dia.esFestivo && !dia.esDiaConvenio && !esBajaManual) {
+            // Guardar horas originales si no se han guardado ya
+            if (dia.horasOriginales === undefined || dia.horasOriginales === 0) {
+              dia.horasOriginales = dia.horasTrabajadas;
+            }
+            
+            dia.esBaja = true;
+            dia.horasTrabajadas = 0;
+            dia.descripcion = 'Baja Médica (Automática)';
+            diasBajaRestantes--;
+          }
+        }
+      }
+    }
   }
 
   formatearFecha(fecha: Date): string {
@@ -184,145 +275,226 @@ export class CalendarioComponent implements OnInit {
     return `${anio}-${mes}-${dia}`;
   }
 
-  /**
-   * CORRECCIÓN CRÍTICA DEL CÁLCULO DE TOTALES
-   *
-   * Conceptos:
-   * - totalLS: Total días L-S del año (365 - domingos ≈ 313)
-   * - laborables: Días que NO son domingo NI festivo NI convenio
-   * - oficiales: Festivos oficiales (sin contar si caen en domingo)
-   * - convenio: Días de convenio (24 y 31 dic)
-   */
+  actualizarHoras(dia: DiaCalendario, event: any) {
+    const valor = parseFloat(event.target.value) || 0;
+    
+    if (valor < 0) {
+      dia.horasTrabajadas = 0;
+    } else if (valor > 24) {
+      dia.horasTrabajadas = 24;
+    } else {
+      dia.horasTrabajadas = valor;
+    }
+    
+    // Guardar como horas originales
+    dia.horasOriginales = dia.horasTrabajadas;
+    
+    event.target.value = dia.horasTrabajadas;
+    
+    // Reaplicar vacaciones y bajas
+    this.aplicarVacacionesYBajas();
+    this.calcularTotales();
+  }
+
+  // ✅ NUEVO: Detectar triple clic para marcar como baja
+  handleClick(dia: DiaCalendario, event: any) {
+    event.stopPropagation();
+    
+    // Si es un día diferente al anterior, reiniciar contador
+    if (this.lastClickedDia !== dia) {
+      this.clickCount = 0;
+      this.lastClickedDia = dia;
+    }
+    
+    // Incrementar contador
+    this.clickCount++;
+    
+    // Limpiar timer anterior
+    if (this.clickTimer) {
+      clearTimeout(this.clickTimer);
+    }
+    
+    // Si es triple clic
+    if (this.clickCount === 3) {
+      this.toggleDiaBaja(dia, event);
+      this.clickCount = 0;
+      this.lastClickedDia = null;
+      return;
+    }
+    
+    // Reiniciar contador después de 500ms
+    this.clickTimer = setTimeout(() => {
+      this.clickCount = 0;
+      this.lastClickedDia = null;
+    }, 500);
+  }
+
+  // ✅ NUEVO: Toggle día de baja manual
+  toggleDiaBaja(dia: DiaCalendario, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+
+    // Solo permitir toggle en días laborables que no estén de vacaciones
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
+
+    // Toggle del estado de baja
+    dia.esBaja = !dia.esBaja;
+    
+    // Si se marca como baja
+    if (dia.esBaja) {
+      // Guardar horas originales si no se han guardado ya
+      if (!dia.horasOriginales || dia.horasOriginales === 0) {
+        dia.horasOriginales = dia.horasTrabajadas;
+      }
+      // Poner a 0 las horas trabajadas
+      dia.horasTrabajadas = 0;
+      dia.descripcion = 'Baja Médica (Manual)';
+      dia.esLaborable = false;
+      dia.esDiaConvenio = false;
+    } else {
+      // Restaurar horas originales
+      if (dia.horasOriginales) {
+        dia.horasTrabajadas = dia.horasOriginales;
+      }
+      dia.descripcion = undefined;
+      dia.esLaborable = true;
+    }
+
+    this.calcularTotales();
+  }
+
+  rellenarJornadaEstandar(horasPorDia: number = 6.67) {
+    this.meses.forEach((mes) => {
+      mes.dias.forEach((dia) => {
+        if (dia.esLaborable && dia.dia > 0) {
+          dia.horasTrabajadas = horasPorDia;
+          dia.horasOriginales = horasPorDia;
+        }
+      });
+    });
+    this.aplicarVacacionesYBajas();
+    this.calcularTotales();
+  }
+
+  limpiarHoras() {
+    this.meses.forEach((mes) => {
+      mes.dias.forEach((dia) => {
+        dia.horasTrabajadas = 0;
+        dia.horasOriginales = 0;
+      });
+    });
+    this.aplicarVacacionesYBajas();
+    this.calcularTotales();
+  }
+
   calcularTotales() {
     let laborables = 0;
     let oficiales = 0;
     let convenio = 0;
-    let totalLS = 0;
-    let totalDiasAnio = 0; // Para verificación
+    let totalHoras = 0;
+    let horasVacaciones = 0;
+    let horasBajas = 0;
     const fechasFestivos: Date[] = [];
-
-    console.log('🔍 ==================== ANÁLISIS CALENDARIO ====================');
 
     this.meses.forEach((mes) => {
       mes.dias.forEach((d) => {
-        // Ignorar días vacíos del calendario (día = 0)
         if (d.dia === 0) return;
 
-        totalDiasAnio++;
-        const fecha = new Date(d.fecha);
-        const diaSemana = fecha.getDay();
-        const esDomingo = diaSemana === 0;
+        const esDomingo = d.fecha.getDay() === 0;
 
-        // ============ PASO 1: TOTAL DÍAS L-S ============
-        // Contar todos los días que NO sean domingo
-        if (!esDomingo) {
-          totalLS++;
-        }
-
-        // ============ PASO 2: FESTIVOS OFICIALES ============
-        // Contar festivos (independientemente del día de la semana)
         if (d.esFestivo) {
           oficiales++;
-          fechasFestivos.push(fecha);
+          fechasFestivos.push(d.fecha);
         }
 
-        // ============ PASO 3: DÍAS DE CONVENIO ============
-        // Contar días de convenio (24 y 31 dic)
         if (d.esDiaConvenio) {
           convenio++;
-          fechasFestivos.push(fecha);
+          fechasFestivos.push(d.fecha);
         }
 
-        // ============ PASO 4: DÍAS LABORABLES NETOS ============
-        /**
-         * CORRECCIÓN CRÍTICA:
-         * Un día es laborable SI Y SOLO SI:
-         * - NO es domingo
-         * - NO es festivo oficial
-         * - NO es día de convenio
-         *
-         * IMPORTANTE: Un festivo que cae en domingo SOLO se cuenta como domingo
-         * NO se resta dos veces (domingo + festivo)
-         */
-        if (!esDomingo && !d.esFestivo && !d.esDiaConvenio) {
-          d.esLaborable = true;
+        if (!esDomingo && !d.esFestivo && !d.esDiaConvenio && !d.esBaja && !d.esVacaciones) {
           laborables++;
-        } else {
-          d.esLaborable = false;
+        }
+
+        // Sumar horas trabajadas actuales
+        totalHoras += d.horasTrabajadas;
+
+        // ✅ Calcular horas descontadas por vacaciones
+        if (d.esVacaciones && d.horasOriginales && d.horasOriginales > 0) {
+          horasVacaciones += d.horasOriginales;
+        }
+
+        // ✅ Calcular horas descontadas por bajas (tanto manuales como automáticas)
+        if (d.esBaja && d.horasOriginales && d.horasOriginales > 0) {
+          horasBajas += d.horasOriginales;
         }
       });
     });
 
-    // ============ ASIGNACIÓN DE TOTALES ============
     this.totalLaborables = laborables;
     this.totalFestivos = oficiales;
     this.totalDiasConvenio = convenio;
+    this.totalHorasTrabajadas = Math.round(totalHoras * 100) / 100;
+    this.horasDescontadasVacaciones = Math.round(horasVacaciones * 100) / 100;
+    this.horasDescontadasBajas = Math.round(horasBajas * 100) / 100;
 
-    // ============ VERIFICACIÓN DE CONSISTENCIA ============
-    const domingos = totalDiasAnio - totalLS;
-    const festivosLaborables = oficiales; // Aproximación
-    const calculoVerificacion = totalLS - festivosLaborables - convenio;
-
-    console.log('📊 DATOS DEL CALENDARIO:', {
-      anio: this.anio,
-      diasTotales: totalDiasAnio,
-      domingos: domingos,
-      totalDiasLS: totalLS,
-      festivosOficiales: oficiales,
-      festivosConvenio: convenio,
-      laborablesNetos: laborables,
-      verificacion: `${totalLS} - ${festivosLaborables} - ${convenio} ≈ ${calculoVerificacion}`,
+    console.log('📊 TOTALES CALENDARIO:', {
+      laborables,
+      festivos: oficiales,
+      convenio,
+      horasTrabajadas: this.totalHorasTrabajadas,
+      horasDescontadasVacaciones: this.horasDescontadasVacaciones,
+      horasDescontadasBajas: this.horasDescontadasBajas,
     });
 
-    // ============ ALERTAS DE INCONSISTENCIA ============
-    if (totalDiasAnio !== 365 && totalDiasAnio !== 366) {
-      console.error('❌ ERROR: Total días del año incorrecto:', totalDiasAnio);
-    }
-
-    if (totalLS > 313 || totalLS < 310) {
-      console.warn('⚠️ ADVERTENCIA: Días L-S fuera de rango normal (310-313):', totalLS);
-    }
-
-    if (laborables > totalLS) {
-      console.error('❌ ERROR CRÍTICO: Laborables no puede ser mayor que Total L-S');
-      console.error('Laborables:', laborables, 'Total L-S:', totalLS);
-    }
-
-    // ============ EMISIÓN DE DATOS ============
     this.datosCalendario.emit({
-      laborables: this.totalLaborables,
+      totalHorasTrabajadas: this.totalHorasTrabajadas,
+      horasDescontadasVacaciones: this.horasDescontadasVacaciones,
+      horasDescontadasBajas: this.horasDescontadasBajas,
       festivosOficiales: this.totalFestivos,
       festivosConvenio: this.totalDiasConvenio,
-      totalDiasLS: totalLS,
+      diasLaborables: this.totalLaborables,
       fechasFestivos: fechasFestivos,
     });
-
-    console.log('✅ Datos emitidos a componente padre:', {
-      laborables: this.totalLaborables,
-      festivosOficiales: this.totalFestivos,
-      festivosConvenio: this.totalDiasConvenio,
-      totalDiasLS: totalLS,
-    });
-    console.log('=========================================================');
   }
 
   obtenerClaseDia(dia: DiaCalendario): string {
     if (dia.dia === 0) return 'dia-vacio';
+    if (dia.esBaja) return 'dia-baja'; // ✅ NUEVO: Clase para días de baja
+    if (dia.esVacaciones) return 'dia-vacaciones'; // ✅ NUEVO: Clase para vacaciones
     if (dia.esFestivo) return 'dia-festivo';
     if (dia.esDiaConvenio) return 'dia-convenio';
     if (dia.esFinDeSemana) return 'dia-fin-semana';
     return 'dia-laborable';
   }
 
-  toggleDiaConvenio(dia: DiaCalendario) {
-    dia.esDiaConvenio = !dia.esDiaConvenio;
-    dia.esLaborable = !dia.esDiaConvenio && !dia.esFestivo && !dia.esFinDeSemana;
+  toggleDiaConvenio(dia: DiaCalendario, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
 
-    // Recalcular totales del calendario
+    // No permitir toggle en vacaciones o bajas
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones || dia.esBaja) return;
+
+    dia.esDiaConvenio = !dia.esDiaConvenio;
+    dia.esLaborable = !dia.esDiaConvenio;
+    
+    if (dia.esDiaConvenio) {
+      dia.horasTrabajadas = 0;
+    }
+
     this.calcularTotales();
   }
 
   tieneFestivos(mes: MesCalendario): boolean {
     return mes.dias.some((dia) => dia.esFestivo || dia.esDiaConvenio);
+  }
+
+  getHorasMes(mes: MesCalendario): number {
+    return mes.dias
+      .filter(d => d.dia > 0)
+      .reduce((sum, d) => sum + d.horasTrabajadas, 0);
   }
 }

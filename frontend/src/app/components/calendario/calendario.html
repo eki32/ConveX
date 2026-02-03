@@ -1,6 +1,18 @@
 <div class="calendario-container">
   <div class="calendario-header">
     <h2>Calendario Laboral Bizkaia {{ anio }}</h2>
+    <p class="subtitulo">Ingresa las horas trabajadas cada día para calcular tu exceso de jornada</p>
+  </div>
+
+  <div class="acciones-rapidas">
+    <button class="btn btn-primary" (click)="rellenarJornadaEstandar(6.5)">
+      <i class="bi bi-lightning-fill"></i>
+      Rellenar 6.5h/día (39h/semana)
+    </button>
+    <button class="btn btn-outline-danger" (click)="limpiarHoras()">
+      <i class="bi bi-trash"></i>
+      Limpiar todo
+    </button>
   </div>
 
   <div class="resumen-anual">
@@ -16,9 +28,9 @@
       <div class="resumen-numero laborable">{{ totalLaborables }}</div>
       <div class="resumen-label">Días Laborables</div>
     </div>
-    <div class="resumen-card">
-      <div class="resumen-numero total">{{ 365 - totalFestivos - totalDiasConvenio - 52 }}</div>
-      <div class="resumen-label">Total L-S Laborables</div>
+    <div class="resumen-card destacado">
+      <div class="resumen-numero total">{{ totalHorasTrabajadas }}</div>
+      <div class="resumen-label">Total Horas Trabajadas</div>
     </div>
   </div>
 
@@ -32,6 +44,14 @@
       <span>Día Convenio</span>
     </div>
     <div class="leyenda-item">
+      <span class="muestra dia-vacaciones"></span>
+      <span>Vacaciones (Bloqueado)</span>
+    </div>
+    <div class="leyenda-item">
+      <span class="muestra dia-baja"></span>
+      <span>Baja Médica (Bloqueado)</span>
+    </div>
+    <div class="leyenda-item">
       <span class="muestra dia-fin-semana"></span>
       <span>Domingo</span>
     </div>
@@ -42,50 +62,93 @@
   </div>
 
   <div class="meses-grid">
-    <div class="mes-card" *ngFor="let mes of meses">
-      <div class="mes-header">
-        <h3>{{ mes.nombre }}</h3>
-      </div>
+    @for (mes of meses; track mes.numero) {
+      <div class="mes-card">
+        <div class="mes-header">
+          <h3>{{ mes.nombre }}</h3>
+          @if (getHorasMes(mes) > 0) {
+            <span class="horas-mes">{{ getHorasMes(mes) }}h</span>
+          }
+        </div>
 
-      <div class="calendario-mes">
-        <div class="dias-semana">
-          <div class="dia-semana-header" *ngFor="let dia of diasSemana">
-            {{ dia }}
+        <div class="calendario-mes">
+          <div class="dias-semana">
+            @for (diaNom of diasSemana; track diaNom) {
+              <div class="dia-semana-header">{{ diaNom }}</div>
+            }
+          </div>
+
+          <div class="dias-grid">
+            @for (dia of mes.dias; track dia.fecha) {
+              <div
+                [class]="obtenerClaseDia(dia)"
+                [class.dia-vacaciones]="dia.esVacaciones"
+                [class.dia-baja]="dia.esBaja"
+                [title]="dia.descripcion || ''"
+                (dblclick)="toggleDiaConvenio(dia)"
+              >
+                @if (dia.dia > 0) {
+                  <span class="numero-dia">{{ dia.dia }}</span>
+                }
+                
+                @if (dia.esFestivo) {
+                  <span class="indicador-festivo">★</span>
+                }
+                @if (dia.esDiaConvenio && !dia.esVacaciones && !dia.esBaja) {
+                  <span class="indicador-convenio" (click)="toggleDiaConvenio(dia, $event)">C</span>
+                }
+                @if (dia.esVacaciones) {
+                  <span class="indicador-vacaciones">🌴</span>
+                }
+                @if (dia.esBaja) {
+                  <span class="indicador-baja">🩹</span>
+                }
+
+                @if (dia.esLaborable && dia.dia > 0 && !dia.esVacaciones && !dia.esBaja) {
+                  <input
+                    type="number"
+                    class="input-horas"
+                    [value]="dia.horasTrabajadas || ''"
+                    (input)="actualizarHoras(dia, $event)"
+                    (click)="handleClick(dia, $event)"
+                    min="0"
+                    max="24"
+                    step="0.5"
+                    placeholder="0h"
+                  />
+                }
+
+                @if (dia.esVacaciones) {
+                  <span class="horas-bloqueadas">0h</span>
+                }
+                
+                @if (dia.esBaja && !dia.esVacaciones) {
+                  <span class="horas-bloqueadas">0h</span>
+                }
+
+                @if (!dia.esLaborable && dia.dia > 0 && !dia.esVacaciones && !dia.esBaja && dia.horasTrabajadas > 0) {
+                  <span class="horas-fijas">
+                    {{ dia.horasTrabajadas }}h
+                  </span>
+                }
+              </div>
+            }
           </div>
         </div>
-
-        <div class="dias-grid">
-          <div
-            *ngFor="let dia of mes.dias"
-            [class]="obtenerClaseDia(dia)"
-            [title]="dia.descripcion || ''"
-            (click)="toggleDiaConvenio(dia)"
-          >
-            <span class="numero-dia" *ngIf="dia.dia > 0">{{ dia.dia }}</span>
-            <span class="indicador-festivo" *ngIf="dia.esFestivo">★</span>
-            <span class="indicador-convenio" *ngIf="dia.esDiaConvenio">C</span>
-          </div>
-        </div>
       </div>
-
-      <!-- Lista de festivos del mes -->
-      <div class="festivos-mes" *ngIf="tieneFestivos(mes)">
-        <div class="festivo-item" *ngFor="let dia of mes.dias">
-          <ng-container *ngIf="dia.esFestivo || dia.esDiaConvenio">
-            <span class="fecha-festivo">{{ dia.dia }}</span>
-            <span class="nombre-festivo">{{ dia.descripcion }}</span>
-          </ng-container>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 
   <div class="nota-info">
-    <p>
-      <strong>Nota:</strong> Este calendario muestra los festivos oficiales de Bizkaia para el
-      sector de alimentación en 2025.
-    </p>
-    <p>Los días marcados de lunes a sábado son laborables. Los domingos son descanso semanal.</p>
-    <p>Puedes hacer clic en días laborables para marcarlos como "Día de Convenio" si aplica.</p>
+    <p><strong>💡 Cómo usar:</strong></p>
+    <ul>
+      <li>Ingresa las horas trabajadas en cada día laborable (L-S).</li>
+      <li>Los festivos, domingos y <strong>periodos de vacaciones</strong> están bloqueados automáticamente.</li>
+      <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.</li>
+      <li><strong>Doble clic en un día laborable</strong> para marcarlo como día de convenio (amarillo).</li>
+      <li>Haz clic en la "C" para desmarcar un día de convenio.</li>
+      <li><strong>NUEVO: Triple clic en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
+      <li>Las horas de días en vacaciones o baja se descuentan automáticamente del total.</li>
+    </ul>
   </div>
 </div>

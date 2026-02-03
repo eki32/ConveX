@@ -63,7 +63,7 @@
               <div>
                 <strong>Jornada máxima proporcional {{ anioCalculo }}:</strong><br />
                 <span class="fs-5 fw-bold text-primary"
-                  >{{ jornadaMaximaProporcional | number: '1.0-0' }}h</span
+                  >{{ jornadaConvenioDinamica | number: '1.0-0' }}h</span
                 >
                 <span class="text-muted ms-2">({{ usuarioLogueado.jornadaContrato }}h/semana)</span>
               </div>
@@ -144,22 +144,7 @@
             </div>
           </div>
 
-          <!-- DÍAS DE BAJA -->
-          <div class="d-flex align-items-center mb-4">
-            <label class="small text-muted flex-grow-1 mb-0">
-              <i class="bi bi-bandaid me-1"></i>Días de Baja Médica
-            </label>
-            <input
-              type="number"
-              class="form-control form-control-sm text-center fw-bold shadow-sm text-danger"
-              [(ngModel)]="diasBaja"
-              (input)="ejecutarCalculo()"
-              style="width: 100px; border-radius: 8px"
-              min="0"
-              placeholder="0"
-            />
-          </div>
-
+          <!-- RESUMEN DATOS CALENDARIO -->
           <!-- RESUMEN DATOS CALENDARIO -->
           <div class="p-3 rounded-3 bg-white border shadow-sm">
             <span
@@ -182,16 +167,57 @@
                 <div class="fw-bold fs-6" style="color: #f39c12">{{ festivosConvenio || '-' }}</div>
               </div>
               <div class="col-6 col-md-4">
-                <div class="text-muted">Efectivos (L-S):</div>
-                <div class="fw-bold fs-6 text-primary">{{ diasLaborables || '-' }}</div>
-              </div>
-              <div class="col-6 col-md-4">
-                <div class="text-muted">Trabajados:</div>
-                <div class="fw-bold fs-6 text-success">
-                  {{ diasTrabajados || diasLaborables || '-' }}
+                <div class="text-muted">Horas trabajadas:</div>
+                <div class="fw-bold fs-6 text-primary">
+                  {{ totalHorasRealizadas | number: '1.0-0' }}h
                 </div>
               </div>
+              @if (horasDescontadasVacaciones > 0) {
+                <div class="col-6 col-md-4">
+                  <div class="text-muted">
+                    <i class="bi bi-calendar-heart me-1"></i>Horas vacaciones:
+                  </div>
+                  <div class="fw-bold fs-6 text-info">
+                    -{{ horasDescontadasVacaciones | number: '1.0-0' }}h
+                  </div>
+                </div>
+              }
+              @if (horasDescontadasBajas > 0) {
+                <div class="col-6 col-md-4">
+                  <div class="text-muted"><i class="bi bi-bandaid me-1"></i>Horas bajas:</div>
+                  <div class="fw-bold fs-6 text-warning">
+                    -{{ horasDescontadasBajas | number: '1.0-0' }}h
+                  </div>
+                </div>
+              }
             </div>
+
+            <!-- Mostrar resumen de horas descontadas si hay -->
+            @if (horasDescontadasVacaciones > 0 || horasDescontadasBajas > 0) {
+              <div class="alert alert-success mt-3 mb-0 py-2 small">
+                <i class="bi bi-check-circle-fill me-1"></i>
+                <strong>Ajuste automático:</strong>
+                Se han descontado
+                <strong
+                  >{{
+                    horasDescontadasVacaciones + horasDescontadasBajas | number: '1.0-0'
+                  }}h</strong
+                >
+                del total ({{ horasDescontadasVacaciones | number: '1.0-0' }}h vacaciones +
+                {{ horasDescontadasBajas | number: '1.0-0' }}h bajas).
+              </div>
+            }
+
+            <!-- Mostrar festivos en vacaciones si hay -->
+            @if (festivosEnVacaciones > 0) {
+              <div class="alert alert-info mt-3 mb-0 py-2 small">
+                <i class="bi bi-gift me-1"></i>
+                <strong>¡Bonus!</strong> Hay {{ festivosEnVacaciones }} festivo(s) en tus
+                vacaciones. Te corresponden
+                <strong>+{{ diasCompensacionVacaciones }} día(s)</strong> adicionales de
+                compensación.
+              </div>
+            }
 
             <!-- Mostrar festivos en vacaciones si hay -->
             <div *ngIf="festivosEnVacaciones > 0" class="alert alert-info mt-3 mb-0 py-2 small">
@@ -292,23 +318,36 @@
       </div>
     </div>
 
-    <!-- SECCIÓN CALENDARIO -->
-    <div class="row mt-5">
-      <div class="col-12">
-        <div class="p-4 rounded-4 bg-white border shadow-sm">
-          <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-            <h5 class="fw-bold mb-0" style="color: #003366">
-              <i class="bi bi-calendar3 me-2"></i>
-              Calendario Laboral Bizkaia {{ anioCalculo }}
-            </h5>
-            <span class="badge bg-warning text-dark px-3 py-2">
-              <i class="bi bi-star-fill me-1"></i>
-              Festivos detectados automáticamente
-            </span>
-          </div>
+   <!-- SECCIÓN CALENDARIO - Reemplaza tu bloque actual de app-calendario con este -->
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="p-4 rounded-4 bg-white border shadow-sm">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h5 class="fw-bold mb-0" style="color: #003366">
+          <i class="bi bi-calendar3 me-2"></i>
+          Calendario Laboral Bizkaia {{ anioCalculo }}
+        </h5>
+        <span class="badge bg-warning text-dark px-3 py-2">
+          <i class="bi bi-star-fill me-1"></i>
+          Festivos detectados automáticamente
+        </span>
+      </div>
 
-          <!-- Componente de calendario -->
-          <app-calendario (datosCalendario)="recibirDatosCalendario($event)"></app-calendario>
+      <!-- DEBUG: Verificar que los periodos se están pasando -->
+      <div class="alert alert-info mb-3" style="font-size: 0.85rem;">
+        <strong>🔍 Debug - Periodos configurados:</strong><br>
+        Invierno: {{ periodoInvierno.inicio || 'No configurado' }} → {{ periodoInvierno.fin || 'No configurado' }}<br>
+        Verano: {{ periodoVerano.inicio || 'No configurado' }} → {{ periodoVerano.fin || 'No configurado' }}<br>
+        Días de baja: {{ diasBaja || 0 }}
+      </div>
+
+      <!-- Componente de calendario CON LOS INPUTS -->
+      <app-calendario 
+        (datosCalendario)="recibirDatosCalendario($event)"
+        [periodoInvierno]="periodoInvierno"
+        [periodoVerano]="periodoVerano"
+        [diasBaja]="diasBaja">
+      </app-calendario>
         </div>
       </div>
     </div>
