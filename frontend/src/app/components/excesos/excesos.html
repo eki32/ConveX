@@ -301,9 +301,7 @@
           >
             <i class="bi bi-exclamation-triangle-fill text-warning fs-5 flex-shrink-0 mt-1"></i>
             <div class="small text-dark">
-              <strong>Recuerda:</strong> Añade los <strong>festivos locales de tu municipio</strong>
-              en el calendario de abajo para que el cálculo de excesos sea correcto. Puedes hacer
-              clic en cualquier día laborable para marcarlo como festivo de convenio.
+              <strong>Recuerda:</strong> Una vez rellenes tu jornada y los periodos de vacaciones que hayas disfrutado, interactúa con el calendario para que se haga el cálculo automático de tu exceso de jornada.
             </div>
           </div>
 
@@ -333,13 +331,7 @@
         </span>
       </div>
 
-      <!-- DEBUG: Verificar que los periodos se están pasando -->
-      <div class="alert alert-info mb-3" style="font-size: 0.85rem;">
-        <strong>🔍 Debug - Periodos configurados:</strong><br>
-        Invierno: {{ periodoInvierno.inicio || 'No configurado' }} → {{ periodoInvierno.fin || 'No configurado' }}<br>
-        Verano: {{ periodoVerano.inicio || 'No configurado' }} → {{ periodoVerano.fin || 'No configurado' }}<br>
-        Días de baja: {{ diasBaja || 0 }}
-      </div>
+      
 
       <!-- Componente de calendario CON LOS INPUTS -->
       <app-calendario 

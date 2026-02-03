@@ -1,3 +1,17 @@
+<div class="nota-info">
+    <p><strong>💡 Cómo usar:</strong></p>
+    <ul>
+      <li>Ingresa las horas trabajadas en cada día laborable (L-S).</li>
+      <li>Los festivos, domingos y <strong>periodos de vacaciones</strong> están bloqueados automáticamente.</li>
+      <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.</li>
+      <li><strong>Doble clic en un día laborable</strong> para marcarlo como día de convenio (amarillo).</li>
+      <li>Haz clic en la "C" para desmarcar un día de convenio.</li>
+      <li><strong>NUEVO: Manten pulsado en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
+      <li>Las horas de días en vacaciones o baja se descuentan automáticamente del total.</li>
+    </ul>
+  </div>
+
+
 <div class="calendario-container">
   <div class="calendario-header">
     <h2>Calendario Laboral Bizkaia {{ anio }}</h2>
@@ -80,12 +94,15 @@
 
           <div class="dias-grid">
             @for (dia of mes.dias; track dia.fecha) {
-              <div
+                <div
                 [class]="obtenerClaseDia(dia)"
                 [class.dia-vacaciones]="dia.esVacaciones"
                 [class.dia-baja]="dia.esBaja"
                 [title]="dia.descripcion || ''"
-                (dblclick)="toggleDiaConvenio(dia)"
+                (dblclick)="onDblClick(dia, $event)"
+                (mousedown)="onMouseDown(dia, $event)"
+                (mouseup)="onMouseUp()"
+                (mouseleave)="onMouseUp()"
               >
                 @if (dia.dia > 0) {
                   <span class="numero-dia">{{ dia.dia }}</span>
@@ -105,12 +122,12 @@
                 }
 
                 @if (dia.esLaborable && dia.dia > 0 && !dia.esVacaciones && !dia.esBaja) {
-                  <input
+                 <input
+                    #inputRef
                     type="number"
                     class="input-horas"
                     [value]="dia.horasTrabajadas || ''"
-                    (input)="actualizarHoras(dia, $event)"
-                    (click)="handleClick(dia, $event)"
+                    (input)="actualizarHoras(dia, $event, inputRef)"
                     min="0"
                     max="24"
                     step="0.5"
@@ -139,16 +156,5 @@
     }
   </div>
 
-  <div class="nota-info">
-    <p><strong>💡 Cómo usar:</strong></p>
-    <ul>
-      <li>Ingresa las horas trabajadas en cada día laborable (L-S).</li>
-      <li>Los festivos, domingos y <strong>periodos de vacaciones</strong> están bloqueados automáticamente.</li>
-      <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.</li>
-      <li><strong>Doble clic en un día laborable</strong> para marcarlo como día de convenio (amarillo).</li>
-      <li>Haz clic en la "C" para desmarcar un día de convenio.</li>
-      <li><strong>NUEVO: Triple clic en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
-      <li>Las horas de días en vacaciones o baja se descuentan automáticamente del total.</li>
-    </ul>
-  </div>
+  
 </div>

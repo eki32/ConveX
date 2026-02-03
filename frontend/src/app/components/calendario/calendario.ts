@@ -1,4 +1,14 @@
-import { Component, OnInit, inject, ChangeDetectorRef, Output, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  ChangeDetectorRef,
+  Output,
+  EventEmitter,
+  Input,
+  SimpleChanges,
+  OnChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FESTIVOS_BIZKAIA } from './festivos-config';
@@ -40,6 +50,7 @@ export class CalendarioComponent implements OnInit, OnChanges {
   festivosOficiales: any[] = [];
   diasConvenio: any[] = [];
 
+
   // Totales
   totalFestivos = 0;
   totalLaborables = 0;
@@ -47,16 +58,21 @@ export class CalendarioComponent implements OnInit, OnChanges {
   totalHorasTrabajadas = 0;
   horasDescontadasVacaciones = 0; // ✅ NUEVO: Horas descontadas por vacaciones
   horasDescontadasBajas = 0; // ✅ NUEVO: Horas descontadas por bajas
-  
-  // Variables para detectar triple clic
-  private clickCount = 0;
-  private clickTimer: any = null;
-  private lastClickedDia: DiaCalendario | null = null;
 
   diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   nombresMeses = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
   ];
 
   @Output() datosCalendario = new EventEmitter<{
@@ -136,15 +152,15 @@ export class CalendarioComponent implements OnInit, OnChanges {
 
   esFechaEnVacaciones(fecha: Date): boolean {
     if (!fecha || fecha.getTime() === 0) return false;
-    
+
     const check = (p: any) => {
       if (!p?.inicio || !p?.fin) return false;
       const inicio = new Date(p.inicio);
       const fin = new Date(p.fin);
-      inicio.setHours(0,0,0,0);
-      fin.setHours(0,0,0,0);
+      inicio.setHours(0, 0, 0, 0);
+      fin.setHours(0, 0, 0, 0);
       const actual = new Date(fecha);
-      actual.setHours(0,0,0,0);
+      actual.setHours(0, 0, 0, 0);
       return actual >= inicio && actual <= fin;
     };
 
@@ -178,7 +194,7 @@ export class CalendarioComponent implements OnInit, OnChanges {
 
       const festivo = this.festivosOficiales.find((f) => f.fecha === fechaStr);
       const diaConvenio = this.diasConvenio.find((d) => d.fecha === fechaStr);
-      
+
       const enVacaciones = this.esFechaEnVacaciones(fecha);
 
       const diaSem = fecha.getDay();
@@ -199,7 +215,7 @@ export class CalendarioComponent implements OnInit, OnChanges {
         horasTrabajadas: 0,
         horasOriginales: 0,
         tipoFestivo: festivo?.tipo,
-        descripcion: enVacaciones ? 'Vacaciones' : (festivo?.descripcion || diaConvenio?.descripcion),
+        descripcion: enVacaciones ? 'Vacaciones' : festivo?.descripcion || diaConvenio?.descripcion,
       });
     }
 
@@ -208,17 +224,15 @@ export class CalendarioComponent implements OnInit, OnChanges {
 
   // ✅ NUEVO: Aplicar vacaciones y bajas
   aplicarVacacionesYBajas() {
-    // Primero restaurar todas las horas originales (excepto bajas manuales)
+   // Primero restaurar todas las horas originales (excepto bajas manuales)
     this.meses.forEach((mes) => {
       mes.dias.forEach((dia) => {
         if (dia.dia > 0 && dia.horasOriginales !== undefined) {
-          // Solo restaurar si NO es una baja manual (las bajas manuales tienen descripción específica)
-          const esBajaManual = dia.esBaja && dia.descripcion === 'Baja Médica (Manual)';
-          if (!esBajaManual) {
-            dia.horasTrabajadas = dia.horasOriginales;
-            dia.esVacaciones = this.esFechaEnVacaciones(dia.fecha);
-            dia.esBaja = false;
-          }
+          // No tocar los días que están marcados como baja manual
+          if (dia.descripcion === 'Baja Médica') return;
+          dia.horasTrabajadas = dia.horasOriginales;
+          dia.esVacaciones = this.esFechaEnVacaciones(dia.fecha);
+          dia.esBaja = false;
         }
       });
     });
@@ -242,22 +256,29 @@ export class CalendarioComponent implements OnInit, OnChanges {
     // SOLO si diasBaja > 0 Y no hay bajas manuales ya marcadas
     if (this.diasBaja > 0) {
       let diasBajaRestantes = this.diasBaja;
-      
+
       for (let mesIdx = 0; mesIdx < this.meses.length && diasBajaRestantes > 0; mesIdx++) {
         const mes = this.meses[mesIdx];
-        
+
         for (let diaIdx = 0; diaIdx < mes.dias.length && diasBajaRestantes > 0; diaIdx++) {
           const dia = mes.dias[diaIdx];
-          
-          // Solo aplicar baja automática a días laborables que no estén de vacaciones 
+
+          // Solo aplicar baja automática a días laborables que no estén de vacaciones
           // y que NO sean bajas manuales
           const esBajaManual = dia.esBaja && dia.descripcion === 'Baja Médica (Manual)';
-          if (dia.dia > 0 && dia.esLaborable && !dia.esVacaciones && !dia.esFestivo && !dia.esDiaConvenio && !esBajaManual) {
+          if (
+            dia.dia > 0 &&
+            dia.esLaborable &&
+            !dia.esVacaciones &&
+            !dia.esFestivo &&
+            !dia.esDiaConvenio &&
+            !esBajaManual
+          ) {
             // Guardar horas originales si no se han guardado ya
             if (dia.horasOriginales === undefined || dia.horasOriginales === 0) {
               dia.horasOriginales = dia.horasTrabajadas;
             }
-            
+
             dia.esBaja = true;
             dia.horasTrabajadas = 0;
             dia.descripcion = 'Baja Médica (Automática)';
@@ -275,93 +296,29 @@ export class CalendarioComponent implements OnInit, OnChanges {
     return `${anio}-${mes}-${dia}`;
   }
 
-  actualizarHoras(dia: DiaCalendario, event: any) {
-    const valor = parseFloat(event.target.value) || 0;
-    
-    if (valor < 0) {
-      dia.horasTrabajadas = 0;
-    } else if (valor > 24) {
-      dia.horasTrabajadas = 24;
-    } else {
-      dia.horasTrabajadas = valor;
-    }
-    
-    // Guardar como horas originales
-    dia.horasOriginales = dia.horasTrabajadas;
-    
-    event.target.value = dia.horasTrabajadas;
-    
-    // Reaplicar vacaciones y bajas
-    this.aplicarVacacionesYBajas();
-    this.calcularTotales();
-  }
+  actualizarHoras(dia: DiaCalendario, event: any, inputRef: HTMLInputElement) {
+    const raw = event.target.value;
 
-  // ✅ NUEVO: Detectar triple clic para marcar como baja
-  handleClick(dia: DiaCalendario, event: any) {
-    event.stopPropagation();
-    
-    // Si es un día diferente al anterior, reiniciar contador
-    if (this.lastClickedDia !== dia) {
-      this.clickCount = 0;
-      this.lastClickedDia = dia;
-    }
-    
-    // Incrementar contador
-    this.clickCount++;
-    
-    // Limpiar timer anterior
-    if (this.clickTimer) {
-      clearTimeout(this.clickTimer);
-    }
-    
-    // Si es triple clic
-    if (this.clickCount === 3) {
-      this.toggleDiaBaja(dia, event);
-      this.clickCount = 0;
-      this.lastClickedDia = null;
-      return;
-    }
-    
-    // Reiniciar contador después de 500ms
-    this.clickTimer = setTimeout(() => {
-      this.clickCount = 0;
-      this.lastClickedDia = null;
-    }, 500);
-  }
-
-  // ✅ NUEVO: Toggle día de baja manual
-  toggleDiaBaja(dia: DiaCalendario, event?: Event) {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-
-    // Solo permitir toggle en días laborables que no estén de vacaciones
-    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
-
-    // Toggle del estado de baja
-    dia.esBaja = !dia.esBaja;
-    
-    // Si se marca como baja
-    if (dia.esBaja) {
-      // Guardar horas originales si no se han guardado ya
-      if (!dia.horasOriginales || dia.horasOriginales === 0) {
+    // Si el usuario está escribiendo un número parcial (ej: "6." para llegar a "6.5"),
+    // no toques el DOM, deja que siga escribiendo
+    if (raw === '' || raw === '.' || raw.endsWith('.')) {
+      const valor = parseFloat(raw);
+      if (!isNaN(valor)) {
+        dia.horasTrabajadas = Math.min(24, Math.max(0, valor));
         dia.horasOriginales = dia.horasTrabajadas;
       }
-      // Poner a 0 las horas trabajadas
-      dia.horasTrabajadas = 0;
-      dia.descripcion = 'Baja Médica (Manual)';
-      dia.esLaborable = false;
-      dia.esDiaConvenio = false;
-    } else {
-      // Restaurar horas originales
-      if (dia.horasOriginales) {
-        dia.horasTrabajadas = dia.horasOriginales;
-      }
-      dia.descripcion = undefined;
-      dia.esLaborable = true;
+      this.calcularTotales();
+      return;
     }
 
+    const valor = parseFloat(raw) || 0;
+    dia.horasTrabajadas = Math.min(24, Math.max(0, valor));
+    dia.horasOriginales = dia.horasTrabajadas;
+
+    // Forzar sincronización del DOM
+    inputRef.value = dia.horasTrabajadas.toString();
+
+    this.aplicarVacacionesYBajas();
     this.calcularTotales();
   }
 
@@ -470,17 +427,71 @@ export class CalendarioComponent implements OnInit, OnChanges {
     return 'dia-laborable';
   }
 
+private longPressTimer: any = null;
+  private longPressActivado = false;
+
+  onMouseDown(dia: DiaCalendario, event: Event) {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.classList.contains('indicador-convenio')) return;
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
+
+    this.longPressActivado = false;
+
+    this.longPressTimer = setTimeout(() => {
+      this.longPressActivado = true;
+      this.toggleDiaBaja(dia);
+    }, 800);
+  }
+
+  onMouseUp() {
+    if (this.longPressTimer) {
+      clearTimeout(this.longPressTimer);
+      this.longPressTimer = null;
+    }
+  }
+
+  onDblClick(dia: DiaCalendario, event: Event) {
+    // Si el long press ya se activó, no hacer nada
+    if (this.longPressActivado) {
+      this.longPressActivado = false;
+      return;
+    }
+    this.toggleDiaConvenio(dia);
+  }
+
+  toggleDiaBaja(dia: DiaCalendario) {
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
+
+    dia.esBaja = !dia.esBaja;
+
+    if (dia.esBaja) {
+      if (!dia.horasOriginales) {
+        dia.horasOriginales = dia.horasTrabajadas;
+      }
+      dia.horasTrabajadas = 0;
+      dia.descripcion = 'Baja Médica';
+      dia.esLaborable = false;
+    } else {
+      dia.horasTrabajadas = dia.horasOriginales || 0;
+      dia.descripcion = undefined;
+      dia.esLaborable = true;
+    }
+
+    this.calcularTotales();
+  }
+
   toggleDiaConvenio(dia: DiaCalendario, event?: Event) {
     if (event) {
       event.stopPropagation();
     }
 
     // No permitir toggle en vacaciones o bajas
-    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones || dia.esBaja) return;
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones || dia.esBaja)
+      return;
 
     dia.esDiaConvenio = !dia.esDiaConvenio;
     dia.esLaborable = !dia.esDiaConvenio;
-    
+
     if (dia.esDiaConvenio) {
       dia.horasTrabajadas = 0;
     }
@@ -493,8 +504,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
   }
 
   getHorasMes(mes: MesCalendario): number {
-    return mes.dias
-      .filter(d => d.dia > 0)
-      .reduce((sum, d) => sum + d.horasTrabajadas, 0);
+    return mes.dias.filter((d) => d.dia > 0).reduce((sum, d) => sum + d.horasTrabajadas, 0);
   }
 }
