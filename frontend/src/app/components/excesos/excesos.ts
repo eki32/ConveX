@@ -89,9 +89,10 @@ export class ExcesosComponent implements OnInit {
 
   async guardarJornada() {
     if (!this.usuarioLogueado.email) return;
-    
+
     this.cargando = true;
-    this.iaService.actualizarJornada(this.usuarioLogueado.email, this.usuarioLogueado.jornadaContrato)
+    this.iaService
+      .actualizarJornada(this.usuarioLogueado.email, this.usuarioLogueado.jornadaContrato)
       .subscribe({
         next: () => {
           if (isPlatformBrowser(this.platformId)) {
@@ -103,12 +104,13 @@ export class ExcesosComponent implements OnInit {
         error: (err) => {
           console.error(err);
           this.cargando = false;
-        }
+        },
       });
   }
 
   calcularDiasTotalesAnio() {
-    const esBisiesto = (this.anioCalculo % 4 === 0 && this.anioCalculo % 100 !== 0) || this.anioCalculo % 400 === 0;
+    const esBisiesto =
+      (this.anioCalculo % 4 === 0 && this.anioCalculo % 100 !== 0) || this.anioCalculo % 400 === 0;
     this.diasTotalesAnio = esBisiesto ? 366 : 365;
   }
 
@@ -136,13 +138,13 @@ export class ExcesosComponent implements OnInit {
   calcularFestivosEnVacaciones() {
     this.festivosEnVacaciones = 0;
     const periodos = [this.periodoInvierno, this.periodoVerano]
-      .filter(p => p.inicio && p.fin)
-      .map(p => ({ start: new Date(p.inicio), end: new Date(p.fin) }));
+      .filter((p) => p.inicio && p.fin)
+      .map((p) => ({ start: new Date(p.inicio), end: new Date(p.fin) }));
 
-    this.festivosDelCalendario.forEach(f => {
+    this.festivosDelCalendario.forEach((f) => {
       const fecha = new Date(f);
       if (fecha.getDay() !== 0) {
-        if (periodos.some(p => fecha >= p.start && fecha <= p.end)) {
+        if (periodos.some((p) => fecha >= p.start && fecha <= p.end)) {
           this.festivosEnVacaciones++;
         }
       }
@@ -161,11 +163,12 @@ export class ExcesosComponent implements OnInit {
     const horasDia = horasSemana / this.DIAS_SEMANA_LABORAL;
 
     this.jornadaMaximaProporcional = (jornadaBase * horasSemana) / 40;
-    
+
     this.excesoHoras = Math.max(0, this.totalHorasRealizadas - this.jornadaMaximaProporcional);
-    
-    this.diasCompensacion = this.excesoHoras > 0 ? Math.round((this.excesoHoras / horasDia) * 10) / 10 : 0;
-    
+
+    this.diasCompensacion =
+      this.excesoHoras > 0 ? Math.round((this.excesoHoras / horasDia) * 10) / 10 : 0;
+
     this.calcularImporteMonetario();
     this.cdr.detectChanges();
   }
@@ -182,8 +185,75 @@ export class ExcesosComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF() as any;
-      doc.text("Informe de Excesos", 14, 20);
-      doc.save(`Informe_${this.usuarioLogueado.nombre}.pdf`);
+      const marginX = 20;
+      let currentY = 20;
+
+      // TÍTULO CENTRAL
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SOLICITUD DE REGULARIZACIÓN DE JORNADA', 105, currentY, { align: 'center' });
+
+      currentY += 20;
+
+      // CUERPO DEL TEXTO
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+
+      const linea1 = `D./Dña. __________________________________________ con DNI ____________________`;
+      const linea2 = `trabajador/a de la entidad, presenta el siguiente informe detallado de exceso de jornada`;
+      const linea3 = `correspondiente al ejercicio anual 2025.`;
+
+      doc.text(linea1, marginX, currentY);
+      currentY += 7;
+      doc.text(linea2, marginX, currentY);
+      currentY += 7;
+      doc.text(linea3, marginX, currentY);
+
+      currentY += 15;
+
+      // CUADRO DE RESULTADOS (RESALTADO)
+      doc.setDrawColor(200);
+      doc.rect(marginX - 2, currentY - 5, 170, 30); // Recuadro decorativo
+
+      doc.setFont('helvetica', 'bold');
+      doc.text(`RESULTADOS DEL CÁLCULO (AÑO 2025):`, marginX, currentY);
+
+      currentY += 10;
+      doc.setFontSize(12);
+      doc.text(`• Días de exceso calculados: ${this.diasCompensacion} días`, marginX + 5, currentY);
+
+      currentY += 8;
+      doc.text(`• Valor monetario estimado: ${this.importeMonetario}€`, marginX + 5, currentY);
+
+      currentY += 20;
+
+      // OPCIONES DE COMPENSACIÓN (CON TABULACIÓN LIMPIA)
+      doc.setFontSize(11);
+      doc.setFont('helvetica', 'normal');
+      doc.text(
+        'De acuerdo con el convenio vigente, solicito recibir dicha compensación mediante:',
+        marginX,
+        currentY,
+      );
+
+      currentY += 10;
+      doc.text('Días de compensación [   ]', marginX + 10, currentY);
+      doc.text('Valor monetario [   ]', marginX + 80, currentY);
+
+      currentY += 30;
+
+      // FECHA Y LUGAR
+      const fechaActual = `En ____________________, a ____ de ____________ de 2026`;
+      doc.text(fechaActual, marginX, currentY);
+
+      currentY += 25;
+
+      // BLOQUE DE FIRMA
+      doc.text('Firma del trabajador/a:', marginX, currentY);
+      doc.line(marginX, currentY + 2, marginX + 60, currentY + 2); // Línea para firmar
+
+      // NOMBRE DEL ARCHIVO
+      doc.save(`Informe_Exceso_2025_${this.usuarioLogueado.nombre}.pdf`);
     }
   }
 }
