@@ -22,9 +22,9 @@ interface DiaCalendario {
   esFinDeSemana: boolean;
   esLaborable: boolean;
   esVacaciones?: boolean;
-  esBaja?: boolean; // ✅ NUEVO: Para marcar días de baja
+  esBaja?: boolean;
   horasTrabajadas: number;
-  horasOriginales?: number; // ✅ NUEVO: Guardar las horas que tenía antes de vacaciones/baja
+  horasOriginales?: number;
   tipoFestivo?: string;
   descripcion?: string;
 }
@@ -39,6 +39,7 @@ interface MesCalendario {
   selector: 'app-calendario',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  template: `<!-- El template se mantiene en archivo separado -->`,
   templateUrl: './calendario.html',
   styleUrls: ['./calendario.css'],
 })
@@ -50,14 +51,13 @@ export class CalendarioComponent implements OnInit, OnChanges {
   festivosOficiales: any[] = [];
   diasConvenio: any[] = [];
 
-
   // Totales
   totalFestivos = 0;
   totalLaborables = 0;
   totalDiasConvenio = 0;
   totalHorasTrabajadas = 0;
-  horasDescontadasVacaciones = 0; // ✅ NUEVO: Horas descontadas por vacaciones
-  horasDescontadasBajas = 0; // ✅ NUEVO: Horas descontadas por bajas
+  horasDescontadasVacaciones = 0;
+  horasDescontadasBajas = 0;
 
   diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   nombresMeses = [
@@ -87,14 +87,18 @@ export class CalendarioComponent implements OnInit, OnChanges {
 
   @Input() periodoInvierno: any;
   @Input() periodoVerano: any;
-  @Input() diasBaja: number = 0; // ✅ NUEVO: Recibir días de baja desde el padre
+  @Input() diasBaja: number = 0;
+
+  // ✅ NUEVO: Variables para manejar eventos táctiles y mouse
+  private longPressTimer: any = null;
+  private longPressActivado = false;
+  private touchMoved = false; // Para detectar si el usuario está haciendo scroll
 
   ngOnInit() {
     this.cargarFestivosDelAnio();
     this.generarCalendario();
   }
 
-  // ✅ NUEVO: Detectar cambios en los inputs
   ngOnChanges(changes: SimpleChanges) {
     if (changes['periodoInvierno'] || changes['periodoVerano'] || changes['diasBaja']) {
       if (this.meses.length > 0) {
@@ -222,13 +226,10 @@ export class CalendarioComponent implements OnInit, OnChanges {
     return dias;
   }
 
-  // ✅ NUEVO: Aplicar vacaciones y bajas
   aplicarVacacionesYBajas() {
-   // Primero restaurar todas las horas originales (excepto bajas manuales)
     this.meses.forEach((mes) => {
       mes.dias.forEach((dia) => {
         if (dia.dia > 0 && dia.horasOriginales !== undefined) {
-          // No tocar los días que están marcados como baja manual
           if (dia.descripcion === 'Baja Médica') return;
           dia.horasTrabajadas = dia.horasOriginales;
           dia.esVacaciones = this.esFechaEnVacaciones(dia.fecha);
@@ -237,23 +238,18 @@ export class CalendarioComponent implements OnInit, OnChanges {
       });
     });
 
-    // Aplicar vacaciones
     this.meses.forEach((mes) => {
       mes.dias.forEach((dia) => {
         if (dia.dia > 0 && dia.esVacaciones) {
-          // Guardar horas originales si no se han guardado ya
           if (dia.horasOriginales === undefined || dia.horasOriginales === 0) {
             dia.horasOriginales = dia.horasTrabajadas;
           }
-          // Poner a 0 las horas trabajadas en vacaciones
           dia.horasTrabajadas = 0;
           dia.descripcion = 'Vacaciones';
         }
       });
     });
 
-    // Aplicar bajas automáticas desde el input (desde el inicio del año)
-    // SOLO si diasBaja > 0 Y no hay bajas manuales ya marcadas
     if (this.diasBaja > 0) {
       let diasBajaRestantes = this.diasBaja;
 
@@ -263,8 +259,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
         for (let diaIdx = 0; diaIdx < mes.dias.length && diasBajaRestantes > 0; diaIdx++) {
           const dia = mes.dias[diaIdx];
 
-          // Solo aplicar baja automática a días laborables que no estén de vacaciones
-          // y que NO sean bajas manuales
           const esBajaManual = dia.esBaja && dia.descripcion === 'Baja Médica (Manual)';
           if (
             dia.dia > 0 &&
@@ -274,7 +268,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
             !dia.esDiaConvenio &&
             !esBajaManual
           ) {
-            // Guardar horas originales si no se han guardado ya
             if (dia.horasOriginales === undefined || dia.horasOriginales === 0) {
               dia.horasOriginales = dia.horasTrabajadas;
             }
@@ -299,8 +292,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
   actualizarHoras(dia: DiaCalendario, event: any, inputRef: HTMLInputElement) {
     const raw = event.target.value;
 
-    // Si el usuario está escribiendo un número parcial (ej: "6." para llegar a "6.5"),
-    // no toques el DOM, deja que siga escribiendo
     if (raw === '' || raw === '.' || raw.endsWith('.')) {
       const valor = parseFloat(raw);
       if (!isNaN(valor)) {
@@ -315,7 +306,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
     dia.horasTrabajadas = Math.min(24, Math.max(0, valor));
     dia.horasOriginales = dia.horasTrabajadas;
 
-    // Forzar sincronización del DOM
     inputRef.value = dia.horasTrabajadas.toString();
 
     this.aplicarVacacionesYBajas();
@@ -375,15 +365,12 @@ export class CalendarioComponent implements OnInit, OnChanges {
           laborables++;
         }
 
-        // Sumar horas trabajadas actuales
         totalHoras += d.horasTrabajadas;
 
-        // ✅ Calcular horas descontadas por vacaciones
         if (d.esVacaciones && d.horasOriginales && d.horasOriginales > 0) {
           horasVacaciones += d.horasOriginales;
         }
 
-        // ✅ Calcular horas descontadas por bajas (tanto manuales como automáticas)
         if (d.esBaja && d.horasOriginales && d.horasOriginales > 0) {
           horasBajas += d.horasOriginales;
         }
@@ -396,15 +383,6 @@ export class CalendarioComponent implements OnInit, OnChanges {
     this.totalHorasTrabajadas = Math.round(totalHoras * 100) / 100;
     this.horasDescontadasVacaciones = Math.round(horasVacaciones * 100) / 100;
     this.horasDescontadasBajas = Math.round(horasBajas * 100) / 100;
-
-    console.log('📊 TOTALES CALENDARIO:', {
-      laborables,
-      festivos: oficiales,
-      convenio,
-      horasTrabajadas: this.totalHorasTrabajadas,
-      horasDescontadasVacaciones: this.horasDescontadasVacaciones,
-      horasDescontadasBajas: this.horasDescontadasBajas,
-    });
 
     this.datosCalendario.emit({
       totalHorasTrabajadas: this.totalHorasTrabajadas,
@@ -419,18 +397,47 @@ export class CalendarioComponent implements OnInit, OnChanges {
 
   obtenerClaseDia(dia: DiaCalendario): string {
     if (dia.dia === 0) return 'dia-vacio';
-    if (dia.esBaja) return 'dia-baja'; // ✅ NUEVO: Clase para días de baja
-    if (dia.esVacaciones) return 'dia-vacaciones'; // ✅ NUEVO: Clase para vacaciones
+    if (dia.esBaja) return 'dia-baja';
+    if (dia.esVacaciones) return 'dia-vacaciones';
     if (dia.esFestivo) return 'dia-festivo';
     if (dia.esDiaConvenio) return 'dia-convenio';
     if (dia.esFinDeSemana) return 'dia-fin-semana';
     return 'dia-laborable';
   }
 
-private longPressTimer: any = null;
-  private longPressActivado = false;
+  // ✅ NUEVO: Manejo de eventos TÁCTILES (touchstart, touchend, touchmove)
+  onTouchStart(dia: DiaCalendario, event: TouchEvent) {
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.classList.contains('indicador-convenio')) return;
+    if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
 
-  onMouseDown(dia: DiaCalendario, event: Event) {
+    this.touchMoved = false;
+    this.longPressActivado = false;
+
+    this.longPressTimer = setTimeout(() => {
+      if (!this.touchMoved) {
+        this.longPressActivado = true;
+        this.toggleDiaBaja(dia);
+        // Vibración háptica si está disponible
+        if (navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+      }
+    }, 600); // 600ms para móviles (un poco más corto que 800ms)
+  }
+
+  onTouchMove(event: TouchEvent) {
+    // Si el usuario mueve el dedo (scroll), cancelar el long press
+    this.touchMoved = true;
+    this.cancelLongPress();
+  }
+
+  onTouchEnd(event: TouchEvent) {
+    this.cancelLongPress();
+  }
+
+  // ✅ NUEVO: Manejo de eventos MOUSE (para escritorio)
+  onMouseDown(dia: DiaCalendario, event: MouseEvent) {
     const target = event.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.classList.contains('indicador-convenio')) return;
     if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones) return;
@@ -444,6 +451,15 @@ private longPressTimer: any = null;
   }
 
   onMouseUp() {
+    this.cancelLongPress();
+  }
+
+  onMouseLeave() {
+    this.cancelLongPress();
+  }
+
+  // ✅ Método auxiliar para cancelar el long press
+  private cancelLongPress() {
     if (this.longPressTimer) {
       clearTimeout(this.longPressTimer);
       this.longPressTimer = null;
@@ -451,7 +467,6 @@ private longPressTimer: any = null;
   }
 
   onDblClick(dia: DiaCalendario, event: Event) {
-    // Si el long press ya se activó, no hacer nada
     if (this.longPressActivado) {
       this.longPressActivado = false;
       return;
@@ -485,7 +500,6 @@ private longPressTimer: any = null;
       event.stopPropagation();
     }
 
-    // No permitir toggle en vacaciones o bajas
     if (dia.dia === 0 || dia.esFestivo || dia.esFinDeSemana || dia.esVacaciones || dia.esBaja)
       return;
 

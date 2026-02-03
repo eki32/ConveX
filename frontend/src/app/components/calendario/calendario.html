@@ -6,7 +6,7 @@
       <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.<strong>* Rellena las horas con (.)</strong></li>
       <li><strong>Doble clic en un día laborable</strong> para marcarlo como día de convenio (amarillo).</li>
       <li>Haz clic en la "C" para desmarcar un día de convenio.</li>
-      <li><strong>NUEVO: Manten pulsado en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
+      <li><strong>NUEVO: Mantén pulsado en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
       <li>Las horas de días en vacaciones o baja se descuentan automáticamente del total.</li>
     </ul>
   </div>
@@ -102,7 +102,10 @@
                 (dblclick)="onDblClick(dia, $event)"
                 (mousedown)="onMouseDown(dia, $event)"
                 (mouseup)="onMouseUp()"
-                (mouseleave)="onMouseUp()"
+                (mouseleave)="onMouseLeave()"
+                (touchstart)="onTouchStart(dia, $event)"
+                (touchmove)="onTouchMove($event)"
+                (touchend)="onTouchEnd($event)"
               >
                 @if (dia.dia > 0) {
                   <span class="numero-dia">{{ dia.dia }}</span>
