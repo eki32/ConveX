@@ -547,8 +547,9 @@
   }
 
   .dias-grid > div {
-    min-height: 55px; /* Altura más contenida */
-    padding: 3px 2px;
+    min-height: 50px; /* Reducimos la altura mínima */
+    padding: 2px !important;
+    justify-content: center;
   }
 
   /* El secreto: reducir el ancho del input de horas para que la celda no sufra */
@@ -730,6 +731,21 @@
 
 .dia-laborable input:hover {
   cursor: text;
+}
+
+.dia-vacaciones, .dia-festivo, .dia-convenio, .dia-baja {
+  position: relative; /* Contenedor de referencia */
+}
+
+.indicador-vacaciones, 
+.indicador-festivo, 
+.indicador-baja {
+  position: absolute !important;
+  top: 2px !important;
+  right: 2px !important;
+  font-size: 12px !important; /* Un poco más pequeño para tablet */
+  margin: 0 !important;
+  z-index: 5;
 }
 
 .dia-baja {
