@@ -521,6 +521,49 @@ border-color: #27ae60;
   }
 }
 
+/* Ajuste específico para Tablets (iPad y similares) */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .calendario-container {
+    padding: 1rem;
+  }
+
+  /* Forzamos un gap más pequeño entre meses para ganar espacio horizontal */
+  .meses-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem; 
+  }
+
+  .mes-card {
+    height: auto;
+    min-height: 480px; /* Reducimos la altura fija para que no estire tanto los días */
+  }
+
+  .calendario-mes {
+    padding: 0.6rem;
+  }
+
+  .dias-grid {
+    gap: 3px; /* Espacio mínimo entre días */
+  }
+
+  .dias-grid > div {
+    min-height: 55px; /* Altura más contenida */
+    padding: 3px 2px;
+  }
+
+  /* El secreto: reducir el ancho del input de horas para que la celda no sufra */
+  .input-horas {
+    max-width: 45px; 
+    font-size: 0.8rem;
+    height: 25px;
+    padding: 2px;
+  }
+
+  .numero-dia {
+    font-size: 0.75rem;
+  }
+}
+
 @media (max-width: 480px) {
   .calendario-container {
     padding: 0.5rem; }/* Reducimos margen lateral total */
