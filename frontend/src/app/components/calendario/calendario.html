@@ -3,7 +3,7 @@
     <ul>
       <li>Ingresa las horas trabajadas en cada día laborable (L-S).</li>
       <li>Los festivos, domingos y <strong>periodos de vacaciones</strong> están bloqueados automáticamente.</li>
-      <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.</li>
+      <li>Usa el botón de arriba para rellenar automáticamente con 6.5h/día.<strong>* Rellena las horas con (.)</strong></li>
       <li><strong>Doble clic en un día laborable</strong> para marcarlo como día de convenio (amarillo).</li>
       <li>Haz clic en la "C" para desmarcar un día de convenio.</li>
       <li><strong>NUEVO: Manten pulsado en un día laborable</strong> para marcarlo como baja médica (naranja 🩹).</li>
@@ -21,7 +21,7 @@
   <div class="acciones-rapidas">
     <button class="btn btn-primary" (click)="rellenarJornadaEstandar(6.5)">
       <i class="bi bi-lightning-fill"></i>
-      Rellenar 6.5h/día (39h/semana)
+      Rellenar 6.5h/día
     </button>
     <button class="btn btn-outline-danger" (click)="limpiarHoras()">
       <i class="bi bi-trash"></i>
