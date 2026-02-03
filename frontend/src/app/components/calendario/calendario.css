@@ -1,12 +1,11 @@
-/* ==========================================================================
-   ESTILOS GENERALES Y CONTENEDOR
-   ========================================================================== */
 .calendario-container {
   max-width: 1600px;
   margin: 0 auto;
   padding: 1.5rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+
 
 .calendario-header {
   text-align: center;
@@ -26,9 +25,8 @@
   margin: 0;
 }
 
-/* ==========================================================================
-   BOTONES Y ACCIONES
-   ========================================================================== */
+
+
 .acciones-rapidas {
   display: flex;
   gap: 1rem;
@@ -50,18 +48,39 @@
   gap: 0.5rem;
 }
 
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-.btn-secondary { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
-.btn-outline-danger { background: white; color: #e74c3c; border: 2px solid #e74c3c; }
-
-.btn-primary:hover, .btn-secondary:hover, .btn-outline-danger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
-/* ==========================================================================
-   RESUMEN Y LEYENDA
-   ========================================================================== */
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.btn-outline-danger {
+  background: white;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+}
+
+.btn-outline-danger:hover {
+  background: #e74c3c;
+  color: white;
+  transform: translateY(-2px);
+}
+
+
 .resumen-anual {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -78,17 +97,51 @@
   transition: all 0.3s ease;
 }
 
+.resumen-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
 .resumen-card.destacado {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  animation: pulse 2s infinite;
 }
 
-.resumen-numero { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-.resumen-numero.festivo { color: #e74c3c; }
-.resumen-numero.convenio { color: #27ae60; }
-.resumen-numero.laborable { color: #3498db; }
-.resumen-numero.total { color: white; }
+.resumen-numero {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.resumen-numero.festivo {
+  color: #e74c3c;
+}
+
+.resumen-numero.convenio {
+ color: #27ae60; /* Verde para convenio */
+}
+
+.resumen-numero.laborable {
+ color: #3498db; /* Azul para laborables */
+}
+
+.resumen-numero.total {
+  color: white;
+}
+
+.resumen-label {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.resumen-card.destacado .resumen-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+
 
 .leyenda {
   display: flex;
@@ -102,32 +155,72 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.leyenda-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
-.muestra { width: 24px; height: 24px; border-radius: 6px; }
-.muestra.dia-festivo { background: #ffe5e5; border: 2px solid #e74c3c; }
-.muestra.dia-convenio { background: #eafaf1; border: 2px solid #27ae60; }
-.muestra.dia-fin-semana { background: #f0f0f0; border: 2px solid #95a5a6; }
-.muestra.dia-laborable { background: #ebf5fb; border: 2px solid #3498db; }
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #34495e;
+}
 
-/* ==========================================================================
-   GRID DE MESES Y CARDS
-   ========================================================================== */
+.muestra {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.muestra.dia-festivo {
+  background: #ffe5e5;
+  border: 2px solid #e74c3c;
+}
+
+.muestra.dia-convenio {
+ background: #eafaf1;
+  border: 2px solid #27ae60; /* Verde */
+}
+
+.muestra.dia-fin-semana {
+  background: #f0f0f0;
+  border: 2px solid #95a5a6;
+}
+
+.muestra.dia-laborable {
+  background: #ebf5fb;
+  border: 2px solid #3498db; /* Azul */
+}
+
+
+
 .meses-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
+  max-width: 100%;
 }
+
+@media (max-width: 1400px) {
+  .meses-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
 
 .mes-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   height: 550px;
-  animation: fadeIn 0.5s ease-out;
+}
+
+.mes-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .mes-header {
@@ -139,26 +232,128 @@
   align-items: center;
 }
 
-.calendario-mes { padding: 1rem; flex: 1; display: flex; flex-direction: column; }
-.dias-semana, .dias-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.dia-semana-header { text-align: center; font-weight: 600; font-size: 0.75rem; color: #7f8c8d; padding: 0.5rem 0; text-transform: uppercase; }
+.mes-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
 
-/* ==========================================================================
-   CELDAS DE DÍAS (LÓGICA DE DISEÑO)
-   ========================================================================== */
+.horas-mes {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+
+
+.calendario-mes {
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dia-semana-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #7f8c8d;
+  padding: 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dias-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+
+
 .dias-grid > div {
   min-height: 60px;
+  padding: 4px;
   border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   position: relative;
-  padding: 4px;
   transition: all 0.2s ease;
+  padding: 4px 3px;
+  font-size: 0.8rem;
+  gap: 2px;
+  /* ✅ NUEVO: Evitar selección de texto durante long press */
   -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+}
+
+
+.dia-vacio {
+  background: transparent;
+  pointer-events: none;
+}
+
+
+.dia-festivo {
+  background: #ffe5e5;
+  border: 2px solid #e74c3c;
+  color: #c0392b;
+}
+
+
+.dia-convenio {
+  background: #eafaf1;
+  border: 2px solid #27ae60;
+  color: #1e8449;
+}
+
+.dia-convenio:hover {
+  background: #d4efdf;
+}
+
+
+.dia-fin-semana {
+  background: #f0f0f0;
+  border: 2px solid #bdc3c7;
+  color: #7f8c8d;
+}
+
+
+.dia-laborable {
+  background: #ebf5fb;
+  border: 2px solid #3498db;
+  color: #2980b9;
+  cursor: pointer;
   user-select: none;
 }
+
+.dia-laborable:hover {
+  background: #d6eaf8;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* ✅ NUEVO: Feedback visual durante el long press */
+.dia-laborable:active {
+  background: #bdd6ee;
+  transform: scale(0.97);
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+
 
 .numero-dia {
   font-weight: 700;
@@ -167,18 +362,27 @@
   justify-content: space-between;
   width: 100%;
   align-items: center;
+  padding: 0 2px;
   margin-bottom: 4px;
 }
 
-.indicador-festivo, .indicador-convenio, .indicador-vacaciones, .indicador-baja {
-  position: static !important;
+.indicador-festivo,
+.indicador-convenio {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.9rem;
   font-weight: bold;
 }
 
-.indicador-festivo { color: #e74c3c; font-size: 0.9rem; }
+.indicador-festivo {
+  color: #e74c3c;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
 
 .indicador-convenio {
   color: #27ae60;
+  cursor: pointer;
   background: white;
   width: 18px;
   height: 18px;
@@ -189,86 +393,404 @@
   justify-content: center;
   font-size: 0.7rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
 }
 
-.dia-vacio { background: transparent; pointer-events: none; }
-.dia-festivo { background: #ffe5e5; border: 2px solid #e74c3c; color: #c0392b; }
-.dia-convenio { background: #eafaf1; border: 2px solid #27ae60; color: #1e8449; }
-.dia-fin-semana { background: #f0f0f0; border: 2px solid #bdc3c7; color: #7f8c8d; }
-.dia-laborable { background: #ebf5fb; border: 2px solid #3498db; color: #2980b9; cursor: pointer; }
-.dia-laborable:active { background: #bdd6ee; transform: scale(0.97); }
+.indicador-convenio:hover {
+ background: #27ae60;
+  color: white;
+  transform: scale(1.1);
+}
 
-.dia-vacaciones { background: linear-gradient(135deg, #aed6f1 0%, #85c1e9 100%) !important; border: 2px solid #3498db !important; color: #1b4f72 !important; }
-.dia-baja { background: linear-gradient(135deg, #fef5e7 0%, #f8c471 100%) !important; border: 2px solid #e67e22 !important; color: #a04000 !important; animation: pulseBaja 0.3s ease-in-out; }
 
-/* ==========================================================================
-   INPUTS DE HORAS (SIN SUBIDOR/BAJADOR)
-   ========================================================================== */
+
 .input-horas {
-  margin-top: auto;
   border: 2px solid #3498db;
+  color: #2c3e50;
   width: 100%;
   max-width: 55px;
-  padding: 3px;
+  padding: 4px 3px;
   border-radius: 6px;
   text-align: center;
   font-weight: 700;
   font-size: 0.85rem;
   background: white;
+  transition: all 0.2s ease;
+  /* ✅ NUEVO: Los inputs sí deben ser seleccionables */
   -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
   user-select: text;
-  /* Eliminar flechas en Chrome, Safari, Edge, Opera */
-  -webkit-appearance: none;
-  margin: 0;
 }
 
-/* Eliminar flechas en Firefox */
-.input-horas[type=number] {
-  -moz-appearance: textfield;
+.input-horas:focus {
+  outline: none;
+  border-color: #2c3e50;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  transform: scale(1.02);
 }
 
-/* Eliminar flechas (extra check) */
+.input-horas::placeholder {
+  color: #bdc3c7;
+  font-size: 0.75rem;
+}
+
+/* Remove spinner de los inputs number */
 .input-horas::-webkit-outer-spin-button,
 .input-horas::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.horas-bloqueadas { display: block; font-size: 11px; font-weight: 600; margin-top: auto; text-align: center; }
-
-/* ==========================================================================
-   MEDIA QUERIES (RESPONSIVE)
-   ========================================================================== */
-@media (max-width: 1400px) { .meses-grid { grid-template-columns: repeat(2, 1fr); } }
-
-@media (max-width: 768px) {
-  .meses-grid { grid-template-columns: 1fr; }
-  .resumen-anual { grid-template-columns: repeat(2, 1fr); }
-  .calendario-header h2 { font-size: 1.5rem; }
+.input-horas[type=number] {
+  -moz-appearance: textfield;
 }
 
+.horas-fijas {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+
+
+.nota-info {
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-left: 4px solid #667eea;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.nota-info p {
+  margin: 0 0 1rem 0;
+  color: #2c3e50;
+}
+
+.nota-info strong {
+  color: #667eea;
+}
+
+.nota-info ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #34495e;
+}
+
+.nota-info li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+
+
+@media (max-width: 768px) {
+  .calendario-container {
+    padding: 1rem;
+  }
+
+  .calendario-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .acciones-rapidas {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acciones-rapidas button {
+    justify-content: center;
+  }
+
+  .resumen-anual {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .resumen-numero {
+    font-size: 2rem;
+  }
+
+  .leyenda {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .meses-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .dias-grid > div {
+    min-height: 65px;
+    font-size: 0.75rem;
+    padding: 4px 2px;
+  }
+
+  .numero-dia {
+    font-size: 0.75rem;
+    padding: 0;
+  }
+
+  .input-horas {
+    margin-top: auto;
+    max-width: 55px;
+    font-size: 0.8rem;
+    padding: 4px 2px;
+  }
+}
+
+/* Ajuste específico para Tablets (iPad y similares) */
 @media (min-width: 481px) and (max-width: 1024px) {
-  .meses-grid { gap: 0.75rem; }
-  .mes-card { height: auto; min-height: 480px; }
-  .dias-grid > div { min-height: 50px; padding: 2px !important; }
-  .input-horas { max-width: 45px; height: 25px; font-size: 0.8rem; }
+  .calendario-container {
+    padding: 1rem;
+  }
+
+  /* Forzamos un gap más pequeño entre meses para ganar espacio horizontal */
+  .meses-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem; 
+  }
+
+  .mes-card {
+    height: auto;
+    min-height: 480px; /* Reducimos la altura fija para que no estire tanto los días */
+  }
+
+  .calendario-mes {
+    padding: 0.6rem;
+  }
+
+  .dias-grid {
+    gap: 3px; /* Espacio mínimo entre días */
+  }
+
+  .dias-grid > div {
+    min-height: 50px; /* Reducimos la altura mínima */
+    padding: 2px !important;
+    justify-content: center;
+  }
+
+  /* El secreto: reducir el ancho del input de horas para que la celda no sufra */
+  .input-horas {
+    margin-top: auto;
+    max-width: 45px; 
+    font-size: 0.8rem;
+    height: 25px;
+    padding: 2px;
+  }
+
+  .numero-dia {
+    font-size: 0.75rem;
+    padding: 0;
+  }
 }
 
 @media (max-width: 480px) {
-  .calendario-container { padding: 0.5rem; }
-  .resumen-anual { grid-template-columns: 1fr; }
-  .mes-card { min-height: 450px; height: auto; }
-  .calendario-mes { padding: 0.5rem; }
-  .dias-grid > div { min-height: 50px; padding: 2px 1px; }
-  .numero-dia { font-size: 0.75rem; }
-  .input-horas { max-width: 42px; height: 22px; font-size: 0.7rem; }
-  .indicador-convenio { width: 14px; height: 14px; min-width: 14px; font-size: 0.55rem; }
-  .indicador-festivo { font-size: 0.8rem !important; }
+  .calendario-container {
+    padding: 0.5rem; }/* Reducimos margen lateral total */
+  .resumen-anual {
+    grid-template-columns: 1fr;
+    
+  }
+
+  .mes-card {
+    height: auto; /* Permitimos que la altura se ajuste al contenido */
+    min-height: 450px;
+  }
+
+  .calendario-mes {
+    padding: 0.5rem; /* Menos espacio interno en el mes */
+  }
+
+  .dias-semana, .dias-grid {
+    gap: 2px; /* Espacio mínimo entre celdas */
+  }
+
+  .dias-semana {
+    gap: 3px;
+  }
+
+  .dias-grid {
+    gap: 3px;
+  }
+
+  .dia-semana-header {
+    font-size: 0.7rem;
+    padding: 0.4rem 0;
+  }
+
+  .dias-grid > div {
+    min-height: 50px; /* Reducimos altura para que quepa todo */
+    padding: 2px 1px;
+  }
+
+  .numero-dia {
+    
+    font-size: 0.75rem;
+    padding-left: 1px;
+    padding: 0;
+
+  }
+
+  .input-horas {
+    margin-top: auto;
+   max-width: 42px; /* Input más estrecho para evitar desbordes */
+    font-size: 0.7rem;
+    padding: 2px 0;
+    height: 22px;
+  }
+
+  .indicador-convenio, .indicador-festivo {
+    top: 2px;
+    right: 2px;
+    font-size: 0.8rem !important;
+  }
+
+  .indicador-convenio {
+   width: 14px;
+    height: 14px;
+    min-width: 14px;
+    font-size: 0.55rem;
+    top: 4px;
+    right: 4px;
+  }
+
+  .indicador-festivo {
+    color: #e74c3c;
+    font-size: 0.8rem !important;
+    top: 4px;
+    right: 4px;
+  }
 }
 
-/* ==========================================================================
-   ANIMACIONES
-   ========================================================================== */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-@keyframes pulseBaja { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mes-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.resumen-card.destacado {
+  animation: pulse 2s infinite;
+}
+
+.dia-vacaciones {
+  background: linear-gradient(135deg, #aed6f1 0%, #85c1e9 100%) !important;
+  border: 2px solid #3498db !important;
+  color: #1b4f72 !important;
+  opacity: 0.9;
+}
+
+.dia-vacaciones input,
+.dia-vacaciones .input-horas {
+  display: none !important;
+}
+
+.dia-baja {
+  background: linear-gradient(135deg, #fef5e7 0%, #f8c471 100%) !important;
+  border: 2px solid #e67e22 !important;
+  color: #a04000 !important;
+  opacity: 0.9;
+}
+
+.dia-baja input,
+.dia-baja .input-horas {
+  display: none !important;
+}
+
+
+.indicador-vacaciones,
+.indicador-baja {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 14px;
+  z-index: 10;
+}
+
+.dia-vacaciones .horas-bloqueadas,
+.dia-baja .horas-bloqueadas {
+  color: #2c3e50;
+  font-weight: 800;
+}
+
+
+.horas-bloqueadas {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.dia-vacaciones .indicador-convenio,
+.dia-baja .indicador-convenio {
+  display: none !important;
+}
+
+.dia-vacaciones:hover,
+.dia-baja:hover {
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.dia-laborable input:hover {
+  cursor: text;
+}
+
+.dia-vacaciones, .dia-festivo, .dia-convenio, .dia-baja {
+  position: relative; /* Contenedor de referencia */
+}
+
+.indicador-vacaciones, 
+.indicador-festivo, 
+.indicador-baja {
+  position: absolute !important;
+  top: 2px !important;
+  right: 2px !important;
+  font-size: 12px !important; /* Un poco más pequeño para tablet */
+  margin: 0 !important;
+  z-index: 5;
+}
+
+
+.indicador-festivo,
+.indicador-convenio,
+.indicador-vacaciones,
+.indicador-baja {
+  position: static !important; /* IMPORTANTE: Deja de flotar sobre el número */
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+.dia-baja {
+  animation: pulseBaja 0.3s ease-in-out;
+}
+
+@keyframes pulseBaja {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
