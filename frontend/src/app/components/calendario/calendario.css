@@ -522,8 +522,24 @@ border-color: #27ae60;
 }
 
 @media (max-width: 480px) {
+  .calendario-container {
+    padding: 0.5rem; }/* Reducimos margen lateral total */
   .resumen-anual {
     grid-template-columns: 1fr;
+    
+  }
+
+  .mes-card {
+    height: auto; /* Permitimos que la altura se ajuste al contenido */
+    min-height: 450px;
+  }
+
+  .calendario-mes {
+    padding: 0.5rem; /* Menos espacio interno en el mes */
+  }
+
+  .dias-semana, .dias-grid {
+    gap: 2px; /* Espacio mínimo entre celdas */
   }
 
   .dias-semana {
@@ -540,23 +556,33 @@ border-color: #27ae60;
   }
 
   .dias-grid > div {
-    min-height: 60px;
+    min-height: 50px; /* Reducimos altura para que quepa todo */
+    padding: 2px 1px;
   }
 
   .numero-dia {
-    font-size: 0.7rem;
-    padding-left: 2px;
+    
+    font-size: 0.65rem;
+    padding-left: 1px;
+
   }
 
   .input-horas {
-    max-width: 50px;
-    font-size: 0.75rem;
-    padding: 4px 2px;
+   max-width: 42px; /* Input más estrecho para evitar desbordes */
+    font-size: 0.7rem;
+    padding: 2px 0;
+    height: 22px;
+  }
+
+  .indicador-convenio, .indicador-festivo {
+    top: 2px;
+    right: 2px;
+    font-size: 0.7rem;
   }
 
   .indicador-convenio {
-    width: 16px;
-    height: 16px;
+   width: 14px;
+    height: 14px;
     font-size: 0.65rem;
     top: 4px;
     right: 4px;
