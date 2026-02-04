@@ -91,7 +91,6 @@ export class ExcesosComponent implements OnInit {
         console.log('👤 Usuario cargado desde localStorage:', this.usuarioLogueado);
         console.log('📅 Fecha de alta en localStorage:', this.usuarioLogueado.fechaAlta);
         
-        // ✅ MEJORADO: Siempre consultar la BD para obtener la fecha más actualizada
         if (this.usuarioLogueado.email) {
           console.log('🔄 Consultando fecha de alta desde la BD...');
           this.iaService.obtenerFechaAltaUsuario(this.usuarioLogueado.email).subscribe({
@@ -99,16 +98,13 @@ export class ExcesosComponent implements OnInit {
               console.log('✅ Respuesta completa del servidor:', response);
               
               if (response && response.fechaAlta) {
-                // ✅ Normalizar la fecha (eliminar la parte de hora si existe)
                 const fechaString = response.fechaAlta.split('T')[0];
                 this.usuarioLogueado.fechaAlta = fechaString;
                 
                 console.log('💾 Fecha normalizada:', fechaString);
                 
-                // Guardar en localStorage
                 localStorage.setItem('usuarioLogueado', JSON.stringify(this.usuarioLogueado));
                 
-                // Verificar si aplica reducción
                 const fechaAlta = new Date(fechaString);
                 const aplicaReduccion = fechaAlta < this.FECHA_LIMITE_JORNADA;
                 
@@ -117,7 +113,6 @@ export class ExcesosComponent implements OnInit {
                 console.log('  - Fecha límite:', this.FECHA_LIMITE_JORNADA.toISOString().split('T')[0]);
                 console.log('  - ¿Aplica reducción?:', aplicaReduccion);
                 
-                // Forzar recálculo
                 this.ejecutarCalculo();
                 this.cdr.detectChanges();
               } else {
@@ -126,7 +121,6 @@ export class ExcesosComponent implements OnInit {
             },
             error: (err) => {
               console.error('❌ Error al obtener fecha de alta:', err);
-              // Si hay error, intentar calcular con los datos existentes
               this.ejecutarCalculo();
             }
           });
@@ -200,46 +194,18 @@ export class ExcesosComponent implements OnInit {
     this.diasCompensacionVacaciones = this.festivosEnVacaciones;
   }
 
-  // ✅ MEJORADO: Cálculo de jornada con logs detallados
   get jornadaConvenioDinamica(): number {
     const base = this.jornadasMaximas[this.anioCalculo] || 1780;
     let jornadaProporcional = (base * this.usuarioLogueado.jornadaContrato) / 40;
-    
-    console.log('═══════════════════════════════════════════════');
-    console.log('📊 CÁLCULO DE JORNADA MÁXIMA PROPORCIONAL');
-    console.log('═══════════════════════════════════════════════');
-    console.log('📅 Año de cálculo:', this.anioCalculo);
-    console.log('📐 Jornada base convenio:', base, 'horas');
-    console.log('⏰ Jornada contrato usuario:', this.usuarioLogueado.jornadaContrato, 'horas/semana');
-    console.log('🔢 Jornada proporcional inicial:', jornadaProporcional, 'horas');
     
     if (this.usuarioLogueado.fechaAlta) {
       const fechaAlta = new Date(this.usuarioLogueado.fechaAlta);
       const fechaLimite = new Date(this.FECHA_LIMITE_JORNADA);
       
-      console.log('───────────────────────────────────────────────');
-      console.log('📆 Verificación de antigüedad:');
-      console.log('  • Fecha de alta:', fechaAlta.toISOString().split('T')[0]);
-      console.log('  • Fecha límite:', fechaLimite.toISOString().split('T')[0]);
-      console.log('  • Fecha de alta < Fecha límite:', fechaAlta < fechaLimite);
-      
       if (fechaAlta < fechaLimite) {
-        const jornadaAntes = jornadaProporcional;
         jornadaProporcional -= this.REDUCCION_HORAS_ANTIGUOS;
-        console.log('✅ REDUCCIÓN APLICADA:');
-        console.log('  • Jornada antes:', jornadaAntes, 'horas');
-        console.log('  • Reducción:', this.REDUCCION_HORAS_ANTIGUOS, 'horas');
-        console.log('  • Jornada después:', jornadaProporcional, 'horas');
-      } else {
-        console.log('⏭️ NO SE APLICA REDUCCIÓN (fecha posterior al límite)');
       }
-    } else {
-      console.log('⚠️ NO HAY FECHA DE ALTA DISPONIBLE');
     }
-    
-    console.log('───────────────────────────────────────────────');
-    console.log('🎯 JORNADA FINAL:', jornadaProporcional, 'horas');
-    console.log('═══════════════════════════════════════════════');
     
     return jornadaProporcional;
   }
@@ -249,7 +215,6 @@ export class ExcesosComponent implements OnInit {
     const horasSemana = this.usuarioLogueado.jornadaContrato || 40;
     const horasDia = horasSemana / this.DIAS_SEMANA_LABORAL;
 
-    // ✅ Usar jornadaConvenioDinamica que ya incluye la reducción
     this.jornadaMaximaProporcional = this.jornadaConvenioDinamica;
 
     this.excesoHoras = Math.max(0, this.totalHorasRealizadas - this.jornadaMaximaProporcional);
