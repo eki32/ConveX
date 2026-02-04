@@ -139,6 +139,7 @@ app.post('/login', (req, res) => {
             if (match) {
                 const { password: _, ...userWithoutPassword } = result[0];
                 console.log(`✅ Login exitoso: ${email}`);
+                console.log(`📅 Fecha de alta del usuario: ${userWithoutPassword.fecha_alta}`);
                 return res.json({ success: true, user: userWithoutPassword });
             } else {
                 return res.status(401).json({ success: false, message: 'Email o contraseña incorrectos' });
@@ -190,6 +191,8 @@ app.post('/api/escanear-nomina', async (req, res) => {
   }
 });
 
+
+
 // ACTUALIZAR JORNADA
 app.put('/api/usuarios/actualizar', (req, res) => {
     const { email, jornada } = req.body;
@@ -208,6 +211,37 @@ app.put('/api/usuarios/actualizar', (req, res) => {
         }
 
         res.json({ success: true, message: 'Jornada actualizada correctamente' });
+    });
+});
+
+// ================== AGREGAR ESTE ENDPOINT EN TU BACKEND ==================
+// Colócalo después del endpoint /api/usuarios/actualizar y antes de "INICIAR SERVIDOR"
+
+// OBTENER FECHA DE ALTA
+app.post('/api/obtener-fecha-alta', (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: 'Email es requerido' });
+    }
+
+    const query = 'SELECT fecha_alta FROM usuarios WHERE email = ?';
+    
+    db.query(query, [email], (err, result) => {
+        if (err) {
+            console.error('❌ Error al obtener fecha de alta:', err);
+            return res.status(500).json({ error: 'Error al consultar la base de datos' });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        console.log(`✅ Fecha de alta obtenida para: ${email}`);
+        res.json({ 
+            fechaAlta: result[0].fecha_alta,
+            success: true 
+        });
     });
 });
 

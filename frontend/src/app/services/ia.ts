@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 registerLocaleData(localeEs);
@@ -214,6 +214,11 @@ Devuelve SOLO JSON puro con este formato exacto:
     this.resultadosGuardados = [];
     this.totales = { bruto: 0, neto: 0 };
   }
+
+ obtenerFechaAltaUsuario(email: string): Observable<any> {
+    return this.http.post(`${this.backendUrl}api/obtener-fecha-alta`, { email });
+  }
+
 
   actualizarJornada(email: any, jornada: any) {
     // Asegúrate de que la URL coincida con tu dominio de Railway

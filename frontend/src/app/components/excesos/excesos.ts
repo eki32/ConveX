@@ -35,6 +35,7 @@ export class ExcesosComponent implements OnInit {
     nombre: '',
     email: '',
     jornadaContrato: 40,
+    fechaAlta: null,
   };
 
   periodoInvierno = { inicio: '', fin: '' };
@@ -52,7 +53,7 @@ export class ExcesosComponent implements OnInit {
   festivosDelCalendario: Date[] = [];
   totalDiasLS: number = 0;
 
-  // ✅ NUEVO: Horas descontadas
+  // Horas descontadas
   horasDescontadasVacaciones: number = 0;
   horasDescontadasBajas: number = 0;
 
@@ -68,6 +69,9 @@ export class ExcesosComponent implements OnInit {
 
   readonly RECARGO_HORA_EXTRA = 0.5;
   readonly DIAS_SEMANA_LABORAL = 6;
+  readonly FECHA_LIMITE_JORNADA = new Date('2007-01-01');
+  readonly REDUCCION_HORAS_ANTIGUOS = 40;
+  
   cargando: boolean = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
@@ -83,6 +87,50 @@ export class ExcesosComponent implements OnInit {
       if (saved) {
         this.usuarioLogueado = JSON.parse(saved);
         if (!this.usuarioLogueado.jornadaContrato) this.usuarioLogueado.jornadaContrato = 40;
+        
+        console.log('👤 Usuario cargado desde localStorage:', this.usuarioLogueado);
+        console.log('📅 Fecha de alta en localStorage:', this.usuarioLogueado.fechaAlta);
+        
+        // ✅ MEJORADO: Siempre consultar la BD para obtener la fecha más actualizada
+        if (this.usuarioLogueado.email) {
+          console.log('🔄 Consultando fecha de alta desde la BD...');
+          this.iaService.obtenerFechaAltaUsuario(this.usuarioLogueado.email).subscribe({
+            next: (response) => {
+              console.log('✅ Respuesta completa del servidor:', response);
+              
+              if (response && response.fechaAlta) {
+                // ✅ Normalizar la fecha (eliminar la parte de hora si existe)
+                const fechaString = response.fechaAlta.split('T')[0];
+                this.usuarioLogueado.fechaAlta = fechaString;
+                
+                console.log('💾 Fecha normalizada:', fechaString);
+                
+                // Guardar en localStorage
+                localStorage.setItem('usuarioLogueado', JSON.stringify(this.usuarioLogueado));
+                
+                // Verificar si aplica reducción
+                const fechaAlta = new Date(fechaString);
+                const aplicaReduccion = fechaAlta < this.FECHA_LIMITE_JORNADA;
+                
+                console.log('📊 Información de jornada:');
+                console.log('  - Fecha de alta:', fechaString);
+                console.log('  - Fecha límite:', this.FECHA_LIMITE_JORNADA.toISOString().split('T')[0]);
+                console.log('  - ¿Aplica reducción?:', aplicaReduccion);
+                
+                // Forzar recálculo
+                this.ejecutarCalculo();
+                this.cdr.detectChanges();
+              } else {
+                console.warn('⚠️ No se recibió fechaAlta del servidor');
+              }
+            },
+            error: (err) => {
+              console.error('❌ Error al obtener fecha de alta:', err);
+              // Si hay error, intentar calcular con los datos existentes
+              this.ejecutarCalculo();
+            }
+          });
+        }
       }
     }
   }
@@ -116,8 +164,8 @@ export class ExcesosComponent implements OnInit {
 
   recibirDatosCalendario(datos: any) {
     this.totalHorasRealizadas = datos.totalHorasTrabajadas;
-    this.horasDescontadasVacaciones = datos.horasDescontadasVacaciones || 0; // ✅ NUEVO
-    this.horasDescontadasBajas = datos.horasDescontadasBajas || 0; // ✅ NUEVO
+    this.horasDescontadasVacaciones = datos.horasDescontadasVacaciones || 0;
+    this.horasDescontadasBajas = datos.horasDescontadasBajas || 0;
     this.festivosOficiales = datos.festivosOficiales;
     this.festivosConvenio = datos.festivosConvenio;
     this.festivosDelCalendario = datos.fechasFestivos || [];
@@ -152,9 +200,48 @@ export class ExcesosComponent implements OnInit {
     this.diasCompensacionVacaciones = this.festivosEnVacaciones;
   }
 
+  // ✅ MEJORADO: Cálculo de jornada con logs detallados
   get jornadaConvenioDinamica(): number {
     const base = this.jornadasMaximas[this.anioCalculo] || 1780;
-    return (base * this.usuarioLogueado.jornadaContrato) / 40;
+    let jornadaProporcional = (base * this.usuarioLogueado.jornadaContrato) / 40;
+    
+    console.log('═══════════════════════════════════════════════');
+    console.log('📊 CÁLCULO DE JORNADA MÁXIMA PROPORCIONAL');
+    console.log('═══════════════════════════════════════════════');
+    console.log('📅 Año de cálculo:', this.anioCalculo);
+    console.log('📐 Jornada base convenio:', base, 'horas');
+    console.log('⏰ Jornada contrato usuario:', this.usuarioLogueado.jornadaContrato, 'horas/semana');
+    console.log('🔢 Jornada proporcional inicial:', jornadaProporcional, 'horas');
+    
+    if (this.usuarioLogueado.fechaAlta) {
+      const fechaAlta = new Date(this.usuarioLogueado.fechaAlta);
+      const fechaLimite = new Date(this.FECHA_LIMITE_JORNADA);
+      
+      console.log('───────────────────────────────────────────────');
+      console.log('📆 Verificación de antigüedad:');
+      console.log('  • Fecha de alta:', fechaAlta.toISOString().split('T')[0]);
+      console.log('  • Fecha límite:', fechaLimite.toISOString().split('T')[0]);
+      console.log('  • Fecha de alta < Fecha límite:', fechaAlta < fechaLimite);
+      
+      if (fechaAlta < fechaLimite) {
+        const jornadaAntes = jornadaProporcional;
+        jornadaProporcional -= this.REDUCCION_HORAS_ANTIGUOS;
+        console.log('✅ REDUCCIÓN APLICADA:');
+        console.log('  • Jornada antes:', jornadaAntes, 'horas');
+        console.log('  • Reducción:', this.REDUCCION_HORAS_ANTIGUOS, 'horas');
+        console.log('  • Jornada después:', jornadaProporcional, 'horas');
+      } else {
+        console.log('⏭️ NO SE APLICA REDUCCIÓN (fecha posterior al límite)');
+      }
+    } else {
+      console.log('⚠️ NO HAY FECHA DE ALTA DISPONIBLE');
+    }
+    
+    console.log('───────────────────────────────────────────────');
+    console.log('🎯 JORNADA FINAL:', jornadaProporcional, 'horas');
+    console.log('═══════════════════════════════════════════════');
+    
+    return jornadaProporcional;
   }
 
   ejecutarCalculo() {
@@ -162,7 +249,8 @@ export class ExcesosComponent implements OnInit {
     const horasSemana = this.usuarioLogueado.jornadaContrato || 40;
     const horasDia = horasSemana / this.DIAS_SEMANA_LABORAL;
 
-    this.jornadaMaximaProporcional = (jornadaBase * horasSemana) / 40;
+    // ✅ Usar jornadaConvenioDinamica que ya incluye la reducción
+    this.jornadaMaximaProporcional = this.jornadaConvenioDinamica;
 
     this.excesoHoras = Math.max(0, this.totalHorasRealizadas - this.jornadaMaximaProporcional);
 
@@ -188,14 +276,12 @@ export class ExcesosComponent implements OnInit {
       const marginX = 20;
       let currentY = 20;
 
-      // TÍTULO CENTRAL
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('SOLICITUD DE REGULARIZACIÓN DE JORNADA', 105, currentY, { align: 'center' });
 
       currentY += 20;
 
-      // CUERPO DEL TEXTO
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
 
@@ -211,9 +297,8 @@ export class ExcesosComponent implements OnInit {
 
       currentY += 15;
 
-      // CUADRO DE RESULTADOS (RESALTADO)
       doc.setDrawColor(200);
-      doc.rect(marginX - 2, currentY - 5, 170, 30); // Recuadro decorativo
+      doc.rect(marginX - 2, currentY - 5, 170, 30);
 
       doc.setFont('helvetica', 'bold');
       doc.text(`RESULTADOS DEL CÁLCULO (AÑO 2025):`, marginX, currentY);
@@ -227,7 +312,6 @@ export class ExcesosComponent implements OnInit {
 
       currentY += 20;
 
-      // OPCIONES DE COMPENSACIÓN (CON TABULACIÓN LIMPIA)
       doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
       doc.text(
@@ -242,17 +326,14 @@ export class ExcesosComponent implements OnInit {
 
       currentY += 30;
 
-      // FECHA Y LUGAR
       const fechaActual = `En ____________________, a ____ de ____________ de 2026`;
       doc.text(fechaActual, marginX, currentY);
 
       currentY += 25;
 
-      // BLOQUE DE FIRMA
       doc.text('Firma del trabajador/a:', marginX, currentY);
-      doc.line(marginX, currentY + 2, marginX + 60, currentY + 2); // Línea para firmar
+      doc.line(marginX, currentY + 2, marginX + 60, currentY + 2);
 
-      // NOMBRE DEL ARCHIVO
       doc.save(`Informe_Exceso_2025_${this.usuarioLogueado.nombre}.pdf`);
     }
   }
